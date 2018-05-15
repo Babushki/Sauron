@@ -1,30 +1,33 @@
 import cherrypy
-from database import MongoAPI
-import json
+from database_management import COLLECTIONS
+from config import CHERRYPY_CONFIG_DEFAULT, WITHOUT_AUTHENTICATION
+from base64 import b64encode
 
 
 @cherrypy.expose
 class UserService:
 
-    def GET(self):
-        with MongoAPI(database='sauron', collection='users') as col:
-            return json.dumps(col.get(None, True))
+    @cherrypy.tools.json_out()
+    def GET(self, login, password):
+        with COLLECTIONS['users'] as col:
+            user_exists = list(col.find({'login': login, 'password': password}))
+            if user_exists:
+                auth_token = b64encode(bytes(f'{login}:{password}', 'utf-8')).decode('utf-8')
+                return {'auth_token': auth_token}
+            else:
+                raise cherrypy.HTTPError(404, 'User not found')
 
     @cherrypy.tools.json_in()
     def POST(self):
         request = cherrypy.request.json
-        try:
-            with MongoAPI(database='sauron', collection='users') as col:
-                col.insert({'login': request['login'], 'password': request['password']})
-        except KeyError:
-            raise cherrypy.HTTPError(400, 'BAD REQUEST')
+        with COLLECTIONS['users'] as col:
+            try:
+                col.insert_one({'login': request['login'], 'password': request['password']})
+            except(KeyError, TypeError) :
+                raise cherrypy.HTTPError(400, 'Bad Request')
 
 
 if __name__ == '__main__':
-    cherrypy.config.update({
-            'server.socket_host': '10.0.2.15',
-            'server.socket_port': 8080,
-        })
-
-    cherrypy.quickstart(UserService(), '/users', {'/': {'request.dispatch': cherrypy.dispatch.MethodDispatcher()}})
+    cherrypy.config.update(CHERRYPY_CONFIG_DEFAULT)
+    cherrypy.quickstart(UserService(), '/api/user', WITHOUT_AUTHENTICATION)
 
