@@ -1,0 +1,12 @@
+{
+    "server": {
+        "address": "127.0.0.1",
+        "port": 8080
+    },
+    "name": "name",
+    "group": "group",
+    "time period": {
+        "processes collecting": 30,
+        "server communication": 60
+    }
+}
