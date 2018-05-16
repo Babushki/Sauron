@@ -10,7 +10,6 @@
 </template>
 
 <script>
-
 export default {
   name: "Login",
   data() {
@@ -22,13 +21,13 @@ export default {
   methods: {
     submitLogin: function(event) {
       event.preventDefault();
-      this.$store.dispatch("login", {login: this.login, password: this.password}).then(() => {
+      this.$store
+        .dispatch("login", { login: this.login, password: this.password })
+        .then(() => {
           if (this.$store.state.logged) {
-              this.$router.push('/main')
-          } else if (this.$store.state.loginError) {
-              alert('Złe dane logowania')
+            this.$router.push("/main");
           }
-      })
+        });
     }
   }
 };
