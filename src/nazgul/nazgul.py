@@ -18,7 +18,7 @@ logging.config.fileConfig('logging.conf')
 
 
 def _get_current_user():
-    return [u.name for u in psutil.users() if u.host == 'localhost'][0]
+    return psutil.users()[0].name
 
 
 def _get_current_processes():

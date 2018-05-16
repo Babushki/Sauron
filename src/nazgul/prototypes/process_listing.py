@@ -3,7 +3,7 @@ import json
 
 import psutil
 
-NAZGUL_NAME = [u.name for u in psutil.users() if u.host == 'localhost'][0]
+NAZGUL_NAME = psutil.users()[0].name
 PROCESSES = [p.as_dict(attrs=['pid',
                               'name',
                               'cmdline',
