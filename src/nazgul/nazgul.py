@@ -12,6 +12,7 @@ import logging
 import logging.config
 
 import psutil
+import requests
 
 
 logging.config.fileConfig('logging.conf')
@@ -79,7 +80,9 @@ class Nazgul:
         while True:
             if self.processes_collecting_timer.countdown_over():
                 self.processes_collecting_timer.restart()
-                collected_processes = {'processes': _get_current_processes(),
+                collected_processes = {'nazgul': self.name,
+                                       'group': self.config['group'],
+                                       'processes': _get_current_processes(),
                                        'create_time': datetime.datetime.now().utcnow().timestamp()}
                 self.processes.append(collected_processes)
                 logging.info('%s processes collected at %s (utc)',
@@ -87,21 +90,20 @@ class Nazgul:
                              collected_processes['create_time'])
             if self.server_communication_timer.countdown_over():
                 self.server_communication_timer.restart()
-                if self._send_processes_to_server():
-                    logging.info('%s process collections sent to server', len(self.processes))
-                    self.processes.clear()
-                else:
-                    logging.error('sending process collections to server unsuccessful')
+                logging.info('sending %s process collections to server', len(self.processes))
+                self.processes = [p for p in self.processes
+                                  if self._send_processes_to_server(p)]
+                logging.info('%s process collections sent to server successfully',
+                             len(self.processes))
 
-    def _send_processes_to_server(self):
-        identified_processess = self.processes
-        for p in identified_processess:
-            p.update({'name': self.name, 'group': self.config['group']})
-        # Temporary "mockup" {
-        with open('nazgul-{:%Y%m%d%H%M%S}.json'.format(datetime.datetime.now()), 'w') as file:
-            json.dump(identified_processess, file, sort_keys=True, indent=4)
-        # }
-        return True
+    def _send_processes_to_server(self, processes):
+        url = '{0[protocol]}://{0[address]}:{0[port]}{0[process_endpoint]}'.format(
+            self.config['server'])
+        # logging.debug('sending to: %s', url)
+        response = requests.post(url, json=processes)
+        if not response.ok:
+            logging.error('response: %s %s', response.status_code, response.reason)
+        return response.ok
 
 
 def main():
