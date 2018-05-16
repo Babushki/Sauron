@@ -65,7 +65,7 @@ class Nazgul:
             self.name = self.config['name']
         except KeyError:
             self.name = _get_current_user()
-            logging.warn(
+            logging.warning(
                 "no 'name' property in the config; assigned current user name (%s)",
                 self.name)
         self.processes_collecting_timer = Timer(datetime.timedelta(
