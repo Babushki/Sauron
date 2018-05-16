@@ -6,7 +6,10 @@ Vue.use(Vuex)
 const rooms = {
   rooms: ['215', '216', '217']
 }
-
+const whitelists={
+  whitelists: ['C++ Klokwium','Java Kolokwium','Python Zaliczenie']
+}
+  
 const validCredentials = {
   login: 'ppiesiak',
   password: 'dupa'
@@ -20,7 +23,9 @@ export default new Vuex.Store({
     errorTimeout: {},
     logged: false,
     rooms: [],
-    room: ""
+    room: "",
+    whitelists: [],
+    whitelist: ""
   },
   mutations: {
     LOGIN(state, data) {
@@ -42,6 +47,12 @@ export default new Vuex.Store({
     },
     CHANGE_ROOM(state, roomName) {
       state.room = roomName
+    },
+    UPDATE_WHITELISTS(state, whitelists){
+      state.whitelists = whitelists
+    },
+    CHANGE_WHITELIST(state, selectedWhitelist){
+      state.whitelist = selectedWhitelist
     }
   },
   actions: {
@@ -80,6 +91,17 @@ export default new Vuex.Store({
     },
     chooseRoom(context, roomName) {
       context.commit('CHANGE_ROOM', roomName)
+    },
+    fetchWhitelists(context){
+      return new Promise((resolve,reject) =>{
+        context.commit('LOADING', true)
+        context.commit('UPDATE_WHITELISTS', whitelists.whitelists)
+        context.commit('LOADING', false)
+        resolve()
+      })
+    },
+    chooseWhitelist(context, selectedWhitelist){
+      context.commit('CHANGE_WHITELIST', selectedWhitelist)
     }
   }
 })

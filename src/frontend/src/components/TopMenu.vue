@@ -2,18 +2,19 @@
 <div>
   <ul>
   <li class="dropdown">
-    <a class="dropbtn">Whitelist</a>
+    <a class="dropbtn" v-if="this.$store.state.whitelist !== ''">Wybrany filtr: {{this.$store.state.whitelist}}</a>
+    <a v-else> Brak wybranego filtra</a>
     <div class="dropdown-content">
-      <a v-for="(data,index) in whitelists" :key='index'>
-          <a>{{data.Whitelist}}</a>
+      <a v-for="(data,index) in this.$store.state.whitelists" :key='index'>
+          <a v-on:click="submitWhitelist(data)">{{data}}</a>
       </a>
     </div>
   </li>
   <li class="dropdown">
-    <a class="dropbtn">Sala</a>
+   <a class="dropbtn">Wybrana sala: {{this.$store.state.room}}</a>
     <div class="dropdown-content">
-      <a v-for="(data,index) in rooms" :key='index'>
-          <a>{{data.Room}}</a>
+      <a  v-for="(data,index) in this.$store.state.rooms" :key='index' >
+          <a v-on:click="submitRoom(data)">{{data}}</a>
       </a>
     </div>
   </li>
@@ -28,30 +29,16 @@
 </template>
 
 <script>
-
 export default {
         name: 'TopMenu',
         data () {
             return {
-                whitelists:[
-                    {"Whitelist": "C++ Klokwium"},
-                    {"Whitelist": "Java Kolokwium"},
-                    {"Whitelist": "Zaliczenie"},
-                    {"Whitelist": "Coś innego"}
-                ],
-                rooms:[
-                    {"Room": "216"},
-                    {"Room": "217"},
-                    {"Room": "218"}
-                ]
+                
             }
         },
         mounted() {
-            this.$http.get("https://httpbin.org/bytes/1").then(result => {
-                this.res = result.body.uuid;
-            }, error => {
-                console.error(error);
-            });
+             this.$store.dispatch('fetchWhitelists');
+             this.$store.dispatch('fetchRooms');
         },
         methods: {
             logout() {
@@ -59,19 +46,17 @@ export default {
                     this.$router.push('/')
                 })
             },
-            sendData() {
-                this.$http.post("https://httpbin.org/post", this.input, { headers: { "content-type": "application/json" } }).then(result => {
-                    this.response = result.body.data;
-                }, error => {
-                    console.error(error);
-                });
+            submitRoom: function(room){
+            this.$store.dispatch("chooseRoom", room).then(()=>
+            {
+                console.log(this.$store.state.room);
+            })
             },
-            getData(){
-                this.$http.get("https://httpbin.org/bytes/3").then(result => {
-                this.res = result.body.uuid;
-            }, error => {
-                console.error(error);
-            });
+            submitWhitelist: function(whitelist){
+            this.$store.dispatch("chooseWhitelist", whitelist).then(()=>
+            {
+                console.log(this.$store.state.whitelist);
+            })
             }
         }
     }
@@ -97,6 +82,7 @@ li a, .dropbtn {
     text-align: center;
     padding: 14px 16px;
     text-decoration: none;
+    cursor: pointer;
 }
 
 li a:hover, .dropdown:hover .dropbtn {
