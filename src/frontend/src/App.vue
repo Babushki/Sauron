@@ -38,12 +38,16 @@ html {
 .disabled {
   opacity: 0.3;
 }
-#main-container {
+#app {
   width: 100%;
+  height: 100%;
   background-image: url("./assets/Sauron.svg");
   background-repeat: no-repeat;
   background-attachment: fixed;
   background-position: bottom right;
   background-size: 30%;
+}
+#main-container {
+  width: 100%;
 }
 </style>

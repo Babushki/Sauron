@@ -25,7 +25,7 @@ export default {
         .dispatch("login", { login: this.login, password: this.password })
         .then(() => {
           if (this.$store.state.logged) {
-            this.$router.push("/main");
+            this.$router.push("/home");
           }
         });
     }

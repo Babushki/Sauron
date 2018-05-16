@@ -11,7 +11,7 @@
       
       <select  v-model="selected" >
           <option value="" disabled selected>...</option>
-        <option  v-for="(data,index) in rooms" :key='index' > {{data.Room}}</option>
+        <option  v-for="(data,index) in this.$store.state.rooms" :key='index' > {{data}}</option>
       </select>
       
       <a class="btn" type="submit" v-on:click="submit" > Wejdź do pokoju</a>
@@ -24,17 +24,16 @@
 <script>
 import image from "../assets/background.jpg";
 export default {
-  name: "MainBody",
+  name: "RoomSelect",
   data() {
     return {
-      selected: '',
-      rooms: [{ Room: "216" }, { Room: "217" }, { Room: "218" }]
+      selected: ''
     };
   },
   mounted() {},
   methods: {
       submit: function(){
-         this.$router.push('/home')
+         this.$store.dispatch("chooseRoom", this.selected)
       }
   }
 };

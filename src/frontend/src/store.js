@@ -3,9 +3,9 @@ import Vuex from 'vuex'
 
 Vue.use(Vuex)
 
-const rooms = [{
+const rooms = {
   rooms: ['215', '216', '217']
-}]
+}
 
 export default new Vuex.Store({
   state: {
@@ -14,7 +14,8 @@ export default new Vuex.Store({
     errorMessage: '',
     errorTimeout: {},
     logged: false,
-    rooms: []
+    rooms: [],
+    room: ""
   },
   mutations: {
     LOGIN(state, data) {
@@ -30,6 +31,12 @@ export default new Vuex.Store({
     },
     LOADING(state, data) {
       state.loading = data
+    },
+    UPDATE_ROOMS(state, rooms) {
+      state.rooms = rooms
+    },
+    CHANGE_ROOM(state, roomName) {
+      state.room = roomName
     }
   },
   actions: {
@@ -50,6 +57,17 @@ export default new Vuex.Store({
           // reject()
         }, 3000)
       })
+    },
+    fetchRooms(context) {
+      return new Promise((resolve, reject) => {
+        context.commit('LOADING', true)
+        context.commit('UPDATE_ROOMS', rooms.rooms)
+        context.commit('LOADING', false)
+        resolve()
+      })
+    },
+    chooseRoom(context, roomName) {
+      context.commit('CHANGE_ROOM', roomName)
     }
   }
 })
