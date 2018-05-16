@@ -7,6 +7,11 @@ const rooms = {
   rooms: ['215', '216', '217']
 }
 
+const validCredentials = {
+  login: 'ppiesiak',
+  password: 'dupa'
+}
+
 export default new Vuex.Store({
   state: {
     loading: false,
@@ -48,14 +53,17 @@ export default new Vuex.Store({
         // call api to login with credentials.login and credentials.password
 
         setTimeout(() => {
-          context.commit('LOGIN', true)
-          // context.commit('ERROR', "Logowanie nie powiodło się")
+          if (credentials.login === validCredentials.login && credentials.password === validCredentials.password) {
+            window.sessionStorage.setItem('Authorization', 'dawkon1oi2nt')
+            context.commit('LOGIN', true)
+            resolve()
+          } else {
+            context.commit('ERROR', "Logowanie nie powiodło się")
+            reject()
+          }
 
           context.commit('LOADING', false)
-
-          resolve()
-          // reject()
-        }, 3000)
+        }, 2500)
       })
     },
     logout(context) {

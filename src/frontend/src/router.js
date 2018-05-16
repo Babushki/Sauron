@@ -10,11 +10,7 @@ export default new Router({
     {
       path: '/',
       name: 'login',
-      component: Login,
-      beforeEnter: (to, from, next) => {
-        window.sessionStorage.setItem('Authorization', 'dawkon1oi2nt')
-        next()
-      }
+      component: Login
     },
     {
       path: '/home',
