@@ -18,8 +18,8 @@
     </div>
   </li>
   <li style="float:right">
-    <a>
-        Ustawienia
+    <a v-on:click="logout">
+        Wyloguj
     </a>
   </li>
   
@@ -54,6 +54,11 @@ export default {
             });
         },
         methods: {
+            logout() {
+                this.$store.dispatch('logout').then(() => {
+                    this.$router.push('/')
+                })
+            },
             sendData() {
                 this.$http.post("https://httpbin.org/post", this.input, { headers: { "content-type": "application/json" } }).then(result => {
                     this.response = result.body.data;

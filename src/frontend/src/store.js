@@ -58,6 +58,10 @@ export default new Vuex.Store({
         }, 3000)
       })
     },
+    logout(context) {
+      window.sessionStorage.removeItem('Authorization')
+      context.commit('LOGIN', false)
+    },
     fetchRooms(context) {
       return new Promise((resolve, reject) => {
         context.commit('LOADING', true)
