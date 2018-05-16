@@ -1,6 +1,6 @@
 import cherrypy
 from database_management import COLLECTIONS
-from config import CHERRYPY_CONFIG_DEFAULT, WITH_AUTHENTICATION
+from config import CHERRYPY_CONFIG_DEFAULT, WITHOUT_AUTHENTICATION
 
 @cherrypy.expose
 class ProcessService:
@@ -29,6 +29,8 @@ class ProcessService:
                     'create_time': request['create_time'],
                     'nazgul': request['nazgul'],
                     'processes': request['processes'],
+                    'group': request['group'],
+                    'screenshot': request.get('screenshot')
                 })
             except (KeyError, TypeError):
                 raise cherrypy.HTTPError(400, 'Bad Request')
@@ -36,4 +38,4 @@ class ProcessService:
 
 if __name__ == '__main__':
     cherrypy.config.update(CHERRYPY_CONFIG_DEFAULT)
-    cherrypy.quickstart(ProcessService(), '/api/process', WITH_AUTHENTICATION)
+    cherrypy.quickstart(ProcessService(), '/api/process', WITHOUT_AUTHENTICATION)
