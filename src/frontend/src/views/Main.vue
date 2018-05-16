@@ -1,20 +1,20 @@
 <template>
   <div id="home">
     <TopMenu/>
-    <Body/>
+    <MainBody/>
   </div>
 </template>
 
 <script>
-import Body from '../components/Body'
+import MainBody from '../components/MainBody'
 import TopMenu from '../components/TopMenu'
 import Footer from '../components/Footer'
 
 export default {
-  name: 'Home',
+  name: 'Main',
   components: {
     TopMenu,
-    Body,
+    MainBody,
     Footer
   }
 }

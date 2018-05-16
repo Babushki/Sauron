@@ -1,77 +1,60 @@
 <template>
       <div class="container">
           <br/>
-            <h1> Aktualnie podłączeni użytkownicy do sali {{ip}}</h1>
-       <a>
-        <a>{{ res }}</a>
+            <h1> Aktualnie podłączeni użytkownicy do sali </h1>
+       
+       
+       <table class="table table-striped table-borderes">
+        <thead>
+          <tr>
+            <th>ID:</th>
+            <th>IP:</th>
+            <th>Akcja:</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="user in users">
+            <td>{{user.id}}</td>
+            <td>{{user.address.zipcode}}</td>
+            <td>
+              <button v-on:click="showData()">Podgląd</button>
+              <button v-on:click="sendData()">Zbanuj</button>
+              
+            </td>
+          </tr>
+        </tbody>
+        
         <br/>
-        <button v-on:click="sendData()">Podgląd</button>
-        <button v-on:click="getData()">Zbanuj</button>
-        <br/>
-      </a>
+      </table>
     </div>
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
   name: "Body",
+  showModal: false,
   data() {
     return {
-      ip: "",
-      res: "",
-      input: {
-        firstname: "",
-        lastname: ""
-      },
-      response: {
-        firstname: "",
-        lastname: ""
-      }
+      users: []
     };
   },
   mounted() {
-    this.$http.get("https://httpbin.org/ip").then(
-      result => {
-        this.ip = result.body.origin;
-      },
-      error => {
-        console.error(error);
-      }
-    );
-    this.$http.get("https://httpbin.org/uuid").then(
-      result => {
-        this.res = result;
-      },
-      error => {
-        console.error(error);
-      }
-    );
+    axios.get('https://jsonplaceholder.typicode.com/users')
+    .then((res)=>{
+      console.log(res.data);
+      this.users = res.data;
+    })
+    .catch((err)=>{
+      console.log(err);
+    })
+    
   },
   methods: {
-    sendData() {
-      this.$http
-        .post("https://httpbin.org/post", this.input, {
-          headers: { "content-type": "application/json" }
-        })
-        .then(
-          result => {
-            this.response = result.body.data;
-          },
-          error => {
-            console.error(error);
-          }
-        );
-    },
-    getData() {
-      this.$http.get("https://httpbin.org/uuid").then(
-        result => {
-          this.res = result.body.uuid;
-        },
-        error => {
-          console.error(error);
-        }
-      );
-    }
+   showData(){
+
+   }
   }
 };
 </script>
@@ -88,5 +71,68 @@ export default {
 textarea {
   height: 100px;
   width: 200px;
+}
+.modal-mask {
+  position: fixed;
+  z-index: 9998;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, .5);
+  display: table;
+  transition: opacity .3s ease;
+}
+
+.modal-wrapper {
+  display: table-cell;
+  vertical-align: middle;
+}
+
+.modal-container {
+  width: 300px;
+  margin: 0px auto;
+  padding: 20px 30px;
+  background-color: #fff;
+  border-radius: 2px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .33);
+  transition: all .3s ease;
+  font-family: Helvetica, Arial, sans-serif;
+}
+
+.modal-header h3 {
+  margin-top: 0;
+  color: #42b983;
+}
+
+.modal-body {
+  margin: 20px 0;
+}
+
+.modal-default-button {
+  float: right;
+}
+
+/*
+ * The following styles are auto-applied to elements with
+ * transition="modal" when their visibility is toggled
+ * by Vue.js.
+ *
+ * You can easily play with the modal transition by editing
+ * these styles.
+ */
+
+.modal-enter {
+  opacity: 0;
+}
+
+.modal-leave-active {
+  opacity: 0;
+}
+
+.modal-enter .modal-container,
+.modal-leave-active .modal-container {
+  -webkit-transform: scale(1.1);
+  transform: scale(1.1);
 }
 </style>

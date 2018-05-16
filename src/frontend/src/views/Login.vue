@@ -24,7 +24,7 @@ export default {
       event.preventDefault();
       this.$store.dispatch("login", {login: this.login, password: this.password}).then(() => {
           if (this.$store.state.logged) {
-              this.$router.push('/home')
+              this.$router.push('/main')
           } else if (this.$store.state.loginError) {
               alert('Złe dane logowania')
           }
