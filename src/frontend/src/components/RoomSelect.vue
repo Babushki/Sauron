@@ -7,14 +7,15 @@
     <div class="header-overlay"></div>
     <div class="header-content text-md-center">
         <center>
-      <h1> Wybierz pokój:</h1>
+          <h1>Witaj w aplikacji Sauron!</h1>
+          <h2> Wybierz salę do monitorowania:</h2>
       
       <select  v-model="selected" >
           <option value="" disabled selected>...</option>
         <option  v-for="(data,index) in this.$store.state.rooms" :key='index' > {{data}}</option>
       </select>
       
-      <a class="btn" type="submit" v-on:click="submit" > Wejdź do pokoju</a>
+      <a class="btn" type="submit" v-on:click="submit" > Wejdź do sali</a>
         </center>
     </div>
     </header>
@@ -27,14 +28,14 @@ export default {
   name: "RoomSelect",
   data() {
     return {
-      selected: ''
+      selected: ""
     };
   },
   mounted() {},
   methods: {
-      submit: function(){
-         this.$store.dispatch("chooseRoom", this.selected)
-      }
+    submit: function() {
+      this.$store.dispatch("chooseRoom", this.selected);
+    }
   }
 };
 </script>
@@ -42,7 +43,7 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 .background {
-    background-size: cover !important;
+  background-size: cover !important;
   background-repeat: no-repeat !important;
   background-image: url("../assets/background.jpg") !important;
   width: 100%;
@@ -50,66 +51,68 @@ export default {
   background-repeat: no-repeat;
   background-attachment: fixed;
 }
-select{
-    margin-top: 2em;
-    margin-bottom: 2em;
+select {
+  margin-top: 2em;
+  margin-bottom: 2em;
 }
-.v-header{
-  height:100%;
-  display:grid;
-  color:#fff;
+.v-header {
+  height: 100%;
+  display: grid;
+  color: #fff;
 }
 
-
-
-.header-overlay{
-  height:100%;
+.header-overlay {
+  height: 100%;
   position: absolute;
-  top:3em;
-  left:0;
-  width:100%;
-  z-index:1;
-  background:#1d1918;
-  opacity:0.86;
+  top: 3em;
+  left: 0;
+  width: 100%;
+  z-index: 1;
+  background: #1d1918;
+  opacity: 0.86;
 }
 
-.header-content{
-  z-index:2;
+.header-content {
+  z-index: 2;
 }
 
-.header-content h1{
-  font-size:50px;
-  margin-bottom:3em;
+.header-content h1 {
+  font-size: 50px;
+  margin-bottom: 2em;
 }
 
-.btn{
+.btn {
   background: #8fd694;
-  color:#fff;
-  font-size:1.2rem;
+  color: #fff;
+  font-size: 1.2rem;
   padding: 1rem 2rem;
+  cursor: pointer;
 }
-select{
-    display: block;
-    padding: 10px 70px 10px 13px !important;
-    max-width: 100%;
-    height: auto !important;
-    border: 1px solid #383838;
-    border-radius: 3px;
-    background-color: #383838;
-    color: white;
-    font-size: 22px;
-    line-height: 16px !important;
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
+.btn:hover{
+  opacity: .90;
 }
-select option{
-    padding: 0 4px;
+select {
+  display: block;
+  padding: 10px 70px 10px 13px !important;
+  max-width: 100%;
+  height: auto !important;
+  border: 1px solid #383838;
+  border-radius: 3px;
+  background-color: #383838;
+  color: white;
+  font-size: 22px;
+  line-height: 16px !important;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
 }
-select::-ms-expand{
-    display: none;
+select option {
+  padding: 0 4px;
 }
-select:focus{
-    outline: none;
+select::-ms-expand {
+  display: none;
+}
+select:focus {
+  outline: none;
 }
 </style>

@@ -44,7 +44,7 @@ html {
   background-image: url("./assets/Sauron.svg");
   background-repeat: no-repeat;
   background-attachment: fixed;
-  background-position: bottom right;
+  background-position: bottom left;
   background-size: 30%;
 }
 #main-container {

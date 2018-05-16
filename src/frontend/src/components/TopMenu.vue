@@ -8,6 +8,7 @@
       <a v-for="(data,index) in this.$store.state.whitelists" :key='index'>
           <a v-on:click="submitWhitelist(data)">{{data}}</a>
       </a>
+      <a><a>Dodaj filtr</a></a>
     </div>
   </li>
   <li class="dropdown">
