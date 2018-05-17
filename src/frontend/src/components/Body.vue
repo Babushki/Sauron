@@ -1,7 +1,7 @@
 <template>
       <div class="body-container">
         <div class="students-list">
-          <h1> Aktualnie podłączeni użytkownicy do sali </h1>
+          <h1> Aktualnie podłączeni użytkownicy do sali {{this.$store.state.room}}</h1>
         
           <table class="table table-striped table-borderes">
             <thead>
