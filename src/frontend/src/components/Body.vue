@@ -1,21 +1,19 @@
 <template>
       <div class="container">
           <br/>
-            <h1> Aktualnie podłączeni użytkownicy do sali </h1>
+            <h1> Aktualnie podłączeni użytkownicy do sali {{this.$store.state.room}}</h1>
        
        
        <table class="table table-striped table-borderes">
         <thead>
           <tr>
-            <th>ID:</th>
-            <th>IP:</th>
+            <th>Nazwa:</th>
             <th>Akcja:</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="user in users">
-            <td>{{user.id}}</td>
-            <td>{{user.address.zipcode}}</td>
+            <td>{{user.name}}</td>
             <td>
               <button v-on:click="showData()">Podgląd</button>
               <button v-on:click="sendData()">Zbanuj</button>
