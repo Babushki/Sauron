@@ -1,15 +1,16 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import axios from 'axios'
 
 Vue.use(Vuex)
 
 const rooms = {
   rooms: ['215', '216', '217']
 }
-const whitelists={
-  whitelists: ['C++ Klokwium','Java Kolokwium','Python Zaliczenie']
+const whitelists = {
+  whitelists: ['C++ Klokwium', 'Java Kolokwium', 'Python Zaliczenie']
 }
-  
+
 const validCredentials = {
   login: 'ppiesiak',
   password: 'dupa'
@@ -25,7 +26,9 @@ export default new Vuex.Store({
     rooms: [],
     room: "",
     whitelists: [],
-    whitelist: ""
+    whitelist: "",
+    students: [],
+    student: null
   },
   mutations: {
     LOGIN(state, data) {
@@ -48,11 +51,17 @@ export default new Vuex.Store({
     CHANGE_ROOM(state, roomName) {
       state.room = roomName
     },
-    UPDATE_WHITELISTS(state, whitelists){
+    UPDATE_WHITELISTS(state, whitelists) {
       state.whitelists = whitelists
     },
-    CHANGE_WHITELIST(state, selectedWhitelist){
+    CHANGE_WHITELIST(state, selectedWhitelist) {
       state.whitelist = selectedWhitelist
+    },
+    UPDATE_STUDENTS(state, students) {
+      state.students = students
+    },
+    CHANGE_STUDENT(state, student) {
+      state.student = student
     }
   },
   actions: {
@@ -92,16 +101,36 @@ export default new Vuex.Store({
     chooseRoom(context, roomName) {
       context.commit('CHANGE_ROOM', roomName)
     },
-    fetchWhitelists(context){
-      return new Promise((resolve,reject) =>{
+    fetchWhitelists(context) {
+      return new Promise((resolve, reject) => {
         context.commit('LOADING', true)
         context.commit('UPDATE_WHITELISTS', whitelists.whitelists)
         context.commit('LOADING', false)
         resolve()
       })
     },
-    chooseWhitelist(context, selectedWhitelist){
+    chooseWhitelist(context, selectedWhitelist) {
       context.commit('CHANGE_WHITELIST', selectedWhitelist)
+    },
+    fetchStudents(context) {
+      return new Promise((resolve, reject) => {
+        context.commit('LOADING', true)
+        axios
+          .get("https://jsonplaceholder.typicode.com/users")
+          .then(res => {
+            context.commit('UPDATE_STUDENTS', res.data)
+            context.commit('LOADING', false)
+            resolve()
+          })
+          .catch(() => {
+            context.commit('ERROR', 'Nie udało się pobrać listy studentów')
+            context.commit('LOADING', false)
+            reject()
+          });
+      })
+    },
+    chooseStudent(context, selectedStudent) {
+      context.commit('CHANGE_STUDENT', selectedStudent)
     }
   }
 })

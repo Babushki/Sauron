@@ -1,72 +1,61 @@
 <template>
-      <div class="container">
-          <br/>
-            <h1> Aktualnie podłączeni użytkownicy do sali </h1>
-       
-       
-       <table class="table table-striped table-borderes">
-        <thead>
-          <tr>
-            <th>ID:</th>
-            <th>IP:</th>
-            <th>Akcja:</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="user in users">
-            <td>{{user.id}}</td>
-            <td>{{user.address.zipcode}}</td>
-            <td>
-              <button v-on:click="showData()">Podgląd</button>
-              <button v-on:click="sendData()">Zbanuj</button>
-              
-            </td>
-          </tr>
-        </tbody>
+      <div class="body-container">
+        <div class="students-list">
+          <h1> Aktualnie podłączeni użytkownicy do sali </h1>
         
-        <br/>
-      </table>
-    </div>
+          <table class="table table-striped table-borderes">
+            <thead>
+              <tr>
+                <th>ID:</th>
+                <th>IP:</th>
+                <th>Akcja:</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-bind:key="student.id" v-for="student in this.$store.state.students">
+                <td>{{student.id}}</td>
+                <td>{{student.address.zipcode}}</td>
+                <td>
+                  <button v-on:click="$store.dispatch('chooseStudent', student)">Podgląd</button>
+                  <button v-on:click="$store.dispatch('chooseStudent', student)">Zbanuj</button>
+                </td>
+              </tr>
+            </tbody>
+            <br/>
+          </table>
+        </div>
+
+        <StudentInfo/>
+      </div>
 </template>
 
 <script>
-import axios from 'axios';
+import axios from "axios";
+import StudentInfo from './StudentInfo'
 
 export default {
   name: "Body",
-  showModal: false,
-  data() {
-    return {
-      users: []
-    };
+  components: {
+    StudentInfo
   },
   mounted() {
-    axios.get('https://jsonplaceholder.typicode.com/users')
-    .then((res)=>{
-      console.log(res.data);
-      this.users = res.data;
-    })
-    .catch((err)=>{
-      console.log(err);
-    })
-    
-  },
-  methods: {
-   showData(){
-
-   }
+    this.$store.dispatch('fetchStudents')
   }
 };
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.container {
+.body-container {
+  display: flex;
+  justify-content: space-between;
+}
+.students-list {
   text-align: center;
-  margin-left: 10%;
+  margin-left: 5%;
   height: 100%;
   background-color: lightgray;
-  width: 400px;
+  width: 40%;
 }
 textarea {
   height: 100px;
@@ -79,9 +68,9 @@ textarea {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, .5);
+  background-color: rgba(0, 0, 0, 0.5);
   display: table;
-  transition: opacity .3s ease;
+  transition: opacity 0.3s ease;
 }
 
 .modal-wrapper {
@@ -95,8 +84,8 @@ textarea {
   padding: 20px 30px;
   background-color: #fff;
   border-radius: 2px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, .33);
-  transition: all .3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.33);
+  transition: all 0.3s ease;
   font-family: Helvetica, Arial, sans-serif;
 }
 
