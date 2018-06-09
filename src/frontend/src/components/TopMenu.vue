@@ -3,7 +3,7 @@
   <ul>
   <li class="dropdown">
     <a class="dropbtn" v-if="this.$store.state.whitelist !== ''">Wybrany filtr: {{this.$store.state.whitelist}}</a>
-    <a v-else> Brak wybranego filtra</a>
+    <a v-else> Brak wybranego filtru</a>
     <div class="dropdown-content">
       <a v-for="(data,index) in this.$store.state.whitelists" :key='index'>
           <a v-on:click="submitWhitelist(data)">{{data}}</a>

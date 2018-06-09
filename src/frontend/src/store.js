@@ -116,7 +116,7 @@ export default new Vuex.Store({
       return new Promise((resolve, reject) => {
         context.commit('LOADING', true)
         axios
-          .get("https://jsonplaceholder.typicode.com/users")
+          .get("http://localhost:3333/users")
           .then(res => {
             context.commit('UPDATE_STUDENTS', res.data)
             context.commit('LOADING', false)

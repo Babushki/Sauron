@@ -1,13 +1,25 @@
 <template>
     <div class="student-info" v-bind:class="{ opened: this.$store.state.student != null }">
-        <h1>Marek Hucz</h1>
+        <h1>{{this.$store.state.student.name}}</h1>
         <span class="processess">
             <h2>Uruchomione procesy:</h2>
-            <ul>
-                <li>systemd</li>
-                <li>kthread</li>
-                <li>python3</li>
-            </ul>
+                <table class="table table-striped table-borderes">
+                <thead>
+                <tr>
+                    <th>PID:</th>
+                    <th>Nazwa:</th>
+                    <th>Użytkownik:</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-bind:key="process.PID" v-for="process in this.$store.state.student.prosesses">
+                    <td>{{process.PID}}</td>
+                    <td>{{process.name}}</td>
+                    <td>{{process.user}}</td>
+                </tr>
+                </tbody>
+                <br/>
+            </table>
         </span>
     </div>
 </template>
