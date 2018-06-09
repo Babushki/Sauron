@@ -19,15 +19,35 @@ class UserService:
 
     @cherrypy.tools.json_in()
     def POST(self):
-        request = cherrypy.request.json
         with COLLECTIONS['users'] as col:
             try:
-                col.insert_one({'login': request['login'], 'password': request['password']})
-            except(KeyError, TypeError) :
+                user = col.find_one({'login': cherrypy.request.login})
+                if user['account_type'] == 'superadmin':
+                    request = cherrypy.request.json
+                    col.insert_one({'login': request['login'], 'password': request['password'], 'account_type': request['account_type']})
+                else:
+                    raise cherrypy.HTTPError(401, 'Unauthorized')
+            except(KeyError, TypeError):
                 raise cherrypy.HTTPError(400, 'Bad Request')
 
 
-if __name__ == '__main__':
-    cherrypy.config.update(CHERRYPY_CONFIG_DEFAULT)
-    cherrypy.quickstart(UserService(), '/api/user', WITHOUT_AUTHENTICATION)
+    @cherrypy.tools.json_in()
+    def PUT(self):
+        request = cherrypy.request.json
+        with COLLECTIONS['users'] as col:
+            try:
+                user = col.find_one({'login': cherrypy.request.login})
+                if user['account_type'] == 'superadmin':
+                    col.update_many({'login': request['login']}, {'$set': {'password': request['password'], 'account_type': request['account_type']}})
+                else:
+                    raise cherrypy.HTTPError(401, 'Unauthorized')
+            except(KeyError, TypeError) :
+                raise cherrypy.HTTPError(400, 'Bad Request')
 
+    def DELETE(self, login):
+        with COLLECTIONS['users'] as col:
+            user = col.find_one({'login': cherrypy.request.login})
+            if user['account_type'] == 'superadmin':
+                col.delete_many({'login': login})
+            else:
+                raise cherrypy.HTTPError(401, 'Unauthorized')

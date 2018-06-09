@@ -18,26 +18,31 @@ class WhitelistService:
 
     @cherrypy.tools.json_in()
     def POST(self):
-        request = cherrypy.request.json
-        with COLLECTIONS['whitelists'] as col:
-            try:
-                col.insert_one({
-                    'name': request['name'],
-                    'active': False,
-                    'processes': request['processes'],
-                    'domains': request['domains'],
-                })
-            except (KeyError, TypeError):
-                raise cherrypy.HTTPError(400, 'Bad Request')
+        with COLLECTIONS['users'] as col:
+            user = col.find_one({'login': cherrypy.request.login})
+        if user['account_type'] in ('superadmin', 'user'):
+            request = cherrypy.request.json
+            with COLLECTIONS['whitelists'] as col:
+                try:
+                    col.insert_one({
+                        'name': request['name'],
+                        'active': False,
+                        'processes': request['processes'],
+                        'domains': request['domains'],
+                    })
+                except (KeyError, TypeError):
+                    raise cherrypy.HTTPError(400, 'Bad Request')
+        else:
+            raise cherrypy.HTTPError(401, 'Unauthorized')
 
     def PATCH(self, name, active):
-        with COLLECTIONS['whitelists'] as col:
-            try:
-                col.update_many({'name': name}, {'$set': {'active': bool(int(active))}})
-            except ValueError:
-                raise cherrypy.HTTPError(400, 'Bad Request')
-
-
-if __name__ == '__main__':
-    cherrypy.config.update(CHERRYPY_CONFIG_DEFAULT)
-    cherrypy.quickstart(WhitelistService(), '/api/whitelist', WITHOUT_AUTHENTICATION)
+        with COLLECTIONS['users'] as col:
+            user = col.find_one({'login': cherrypy.request.login})
+        if user['account_type'] in ('superadmin', 'user'):
+            with COLLECTIONS['whitelists'] as col:
+                try:
+                    col.update_many({'name': name}, {'$set': {'active': bool(int(active))}})
+                except ValueError:
+                    raise cherrypy.HTTPError(400, 'Bad Request')
+        else:
+            raise cherrypy.HTTPError(401, 'Unauthorized')
