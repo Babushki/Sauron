@@ -4,9 +4,7 @@ import axios from 'axios'
 
 Vue.use(Vuex)
 
-const rooms = {
-  rooms: ['215', '216', '217']
-}
+
 const whitelists = {
   whitelists: ['C++ Klokwium', 'Java Kolokwium', 'Python Zaliczenie']
 }
@@ -24,11 +22,11 @@ export default new Vuex.Store({
     errorTimeout: {},
     logged: false,
     rooms: [],
-    room: "",
+    room: 3333,
     whitelists: [],
     whitelist: "",
     students: [],
-    student: null
+    student: {}
   },
   mutations: {
     LOGIN(state, data) {
@@ -93,13 +91,23 @@ export default new Vuex.Store({
     fetchRooms(context) {
       return new Promise((resolve, reject) => {
         context.commit('LOADING', true)
-        context.commit('UPDATE_ROOMS', rooms.rooms)
-        context.commit('LOADING', false)
-        resolve()
+        axios
+          .get("http://localhost:3333/groups")
+          .then(res => {
+            context.commit('UPDATE_ROOMS', res.data)
+            context.commit('LOADING', false)
+            resolve()
+          })
+          .catch(() => {
+            context.commit('ERROR', 'Nie udało się pobrać listy grup')
+            context.commit('LOADING', false)
+            reject()
+          });
       })
     },
     chooseRoom(context, roomName) {
       context.commit('CHANGE_ROOM', roomName)
+      context.commit('UPDATE_STUDENTS', this.state.rooms[this.state.room].students)
     },
     fetchWhitelists(context) {
       return new Promise((resolve, reject) => {
@@ -115,18 +123,8 @@ export default new Vuex.Store({
     fetchStudents(context) {
       return new Promise((resolve, reject) => {
         context.commit('LOADING', true)
-        axios
-          .get("http://localhost:3333/users")
-          .then(res => {
-            context.commit('UPDATE_STUDENTS', res.data)
-            context.commit('LOADING', false)
-            resolve()
-          })
-          .catch(() => {
-            context.commit('ERROR', 'Nie udało się pobrać listy studentów')
-            context.commit('LOADING', false)
-            reject()
-          });
+        context.commit('LOADING', false)
+        resolve()
       })
     },
     chooseStudent(context, selectedStudent) {

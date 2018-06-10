@@ -11,8 +11,8 @@
           <h2> Wybierz salę do monitorowania:</h2>
       
       <select  v-model="selected" >
-          <option value="" disabled selected>...</option>
-        <option  v-for="(data,index) in this.$store.state.rooms" :key='index' > {{data}}</option>
+        <option value="" disabled selected>...</option>
+        <option  v-for="(data,index) in this.$store.state.rooms" :key='index' v-bind:value="data.id"> {{data.name}}</option>
       </select>
       
       <a class="btn" type="submit" v-on:click="submit" > Wejdź do sali</a>
@@ -64,7 +64,6 @@ select {
 .header-overlay {
   height: 100%;
   position: absolute;
-  top: 3em;
   left: 0;
   width: 100%;
   z-index: 1;

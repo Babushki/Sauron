@@ -12,10 +12,10 @@
     </div>
   </li>
   <li class="dropdown">
-   <a class="dropbtn">Wybrana sala: {{this.$store.state.room}}</a>
+   <a class="dropbtn">Wybrana sala: {{this.$store.state.rooms[this.$store.state.room].name}}</a>
     <div class="dropdown-content">
       <a  v-for="(data,index) in this.$store.state.rooms" :key='index' >
-          <a v-on:click="submitRoom(data)">{{data}}</a>
+          <a v-on:click="submitRoom(data.id)">{{data.name}}</a>
       </a>
     </div>
   </li>

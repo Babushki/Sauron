@@ -1,17 +1,20 @@
 <template>
       <div class="body-container">
         <div class="students-list">
-          <h1> Aktualnie podłączeni użytkownicy do sali {{this.$store.state.room}}</h1>
+          <h1> Aktualnie podłączeni użytkownicy do sali {{this.$store.state.rooms[this.$store.state.room].name}}</h1>
         
+
           <table class="table table-striped table-borderes">
             <thead>
               <tr>
+                <th>Id:</th>
                 <th>Nazwa:</th>
                 <th>Akcja:</th>
               </tr>
             </thead>
             <tbody>
-              <tr v-bind:key="student.id" v-for="student in this.$store.state.students">
+              <tr v-bind:key="student.id" v-for="student in $store.state.students" >
+                <td>{{student.id}}</td>
                 <td>{{student.name}}</td>
                 <td>
                   <button v-on:click="$store.dispatch('chooseStudent', student)">Podgląd</button>
@@ -36,9 +39,7 @@ export default {
   components: {
     StudentInfo
   },
-  mounted() {
-    this.$store.dispatch('fetchStudents')
-  }
+  
 };
 </script>
 

@@ -1,8 +1,8 @@
 <template>
   <div id="home">
     <TopMenu/>
-    <Body v-if="this.$store.state.room !== ''"/>
-    <RoomSelect v-if="this.$store.state.room === ''"/>
+    <Body v-if="this.$store.state.room !== 3333"/>
+    <RoomSelect v-if="this.$store.state.room === 3333"/>
   </div>
 </template>
 
