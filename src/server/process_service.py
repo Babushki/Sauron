@@ -6,7 +6,7 @@ from config import CHERRYPY_CONFIG_DEFAULT, WITHOUT_AUTHENTICATION
 class ProcessService:
 
     @cherrypy.tools.json_out()
-    def GET(self, time_from = None, time_to = None, nazgul = None, limit = 20):
+    def GET(self, time_from = None, time_to = None, nazgul = None, group = None, limit = 20):
         query = {}
         with COLLECTIONS['users'] as col:
             user = col.find_one({'login': cherrypy.request.login})
@@ -16,6 +16,8 @@ class ProcessService:
                     query.update({'create_time': {'$lt': int(time_to), '$gte': int(time_from)}})
                 if nazgul:
                     query.update({'nazgul': str(nazgul)})
+                if group:
+                    query.update({'group': str(group)})
 
                 with COLLECTIONS['processes'] as col:
                     return list(col.find(query, {'_id': False}).limit(int(limit)))

@@ -51,3 +51,26 @@ class UserService:
                 col.delete_many({'login': login})
             else:
                 raise cherrypy.HTTPError(401, 'Unauthorized')
+
+@cherrypy.expose
+class NazgulListService:
+
+    @cherrypy.tools.json_out()
+    def GET(self, time_from, time_to = None, group = None):
+        with COLLECTIONS['users'] as col:
+            user = col.find_one({'login': cherrypy.request.login})
+        if user['account_type'] in ('superadmin', 'user'):
+            query = {}
+            if time_to:
+                query.update({'create_time': {'$lt': int(time_to), '$gte': int(time_from)}})
+            else:
+                query.update({'create_time': {'$gte': int(time_from)}})
+            if group:
+                query.update({'group': str(group)})
+
+            with COLLECTIONS['processes'] as col:
+                processes = list(col.find(query, {'_id': False}))
+            users = set()
+            for p in processes:
+                users.add(p['nazgul'])
+            return users
