@@ -22,6 +22,7 @@ export default {
   },
   mounted() {
     this.$store.dispatch('fetchRooms');
+    this.$store.dispatch('fetchWhitelists');
   }
 };
 </script>

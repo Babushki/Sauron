@@ -4,11 +4,6 @@ import axios from 'axios'
 
 Vue.use(Vuex)
 
-
-const whitelists = {
-  whitelists: ['C++ Klokwium', 'Java Kolokwium', 'Python Zaliczenie']
-}
-
 const validCredentials = {
   login: 'ppiesiak',
   password: 'dupa'
@@ -25,6 +20,7 @@ export default new Vuex.Store({
     room: 3333,
     whitelists: [],
     whitelist: "",
+    editWhitelist: {},
     students: [],
     student: {}
   },
@@ -54,6 +50,15 @@ export default new Vuex.Store({
     },
     CHANGE_WHITELIST(state, selectedWhitelist) {
       state.whitelist = selectedWhitelist
+    },
+    EDIT_WHITELIST(state, whitelist) {
+      state.editWhitelist = whitelist
+    },
+    updateEditWhitelistName(state, name) {
+      state.editWhitelist.name = name
+    },
+    updateEditWhitelistAllowed(state, allowed) {
+      state.editWhitelist.allowed = allowed
     },
     UPDATE_STUDENTS(state, students) {
       state.students = students
@@ -112,13 +117,61 @@ export default new Vuex.Store({
     fetchWhitelists(context) {
       return new Promise((resolve, reject) => {
         context.commit('LOADING', true)
-        context.commit('UPDATE_WHITELISTS', whitelists.whitelists)
-        context.commit('LOADING', false)
-        resolve()
+
+        axios
+          .get("http://localhost:3333/whitelists")
+          .then(res => {
+            context.commit('UPDATE_WHITELISTS', res.data)
+            context.commit('LOADING', false)
+            resolve()
+          })
+          .catch(() => {
+            context.commit('ERROR', 'Nie udało się pobrać listy grup')
+            context.commit('LOADING', false)
+            reject()
+          });
       })
     },
     chooseWhitelist(context, selectedWhitelist) {
       context.commit('CHANGE_WHITELIST', selectedWhitelist)
+    },
+    editWhitelist(context, whitelist) {
+      context.commit('EDIT_WHITELIST', whitelist)
+    },
+    deleteWhitelist(context, whitelist) {
+      return new Promise((resolve, reject) => {
+        context.commit('LOADING', true)
+  
+        axios
+            .delete("http://localhost:3333/whitelists", whitelist.id)
+            .then(() => {
+              context.dispatch('fetchWhitelists')
+            })
+            .catch(() => {
+              context.commit('ERROR', 'Nie udało się usunąć listy')
+              context.commit('LOADING', false)
+              reject()
+            });
+          })
+    },
+    addWhitelist(context) {
+      context.commit('EDIT_WHITELIST', {id: null, name: "Nowa lista", allowed: []})
+    },
+    saveWhitelist(context) {
+      return new Promise((resolve, reject) => {
+      context.commit('LOADING', true)
+
+      axios
+          .post("http://localhost:3333/whitelists", context.state.editWhitelist)
+          .then(() => {
+            context.dispatch('fetchWhitelists')
+          })
+          .catch(() => {
+            context.commit('ERROR', 'Nie udało się zapisać listy')
+            context.commit('LOADING', false)
+            reject()
+          });
+        })
     },
     fetchStudents(context) {
       return new Promise((resolve, reject) => {

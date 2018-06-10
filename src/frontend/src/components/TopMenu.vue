@@ -1,18 +1,22 @@
 <template>
 <div>
   <ul>
+      <li>
+          <router-link to="/home"><button>Podlgąd sali</button></router-link>
+      </li>
   <li class="dropdown">
-    <a class="dropbtn" v-if="this.$store.state.whitelist !== ''">Wybrany filtr: {{this.$store.state.whitelist}}</a>
+    <a class="dropbtn" v-if="this.$store.state.whitelist !== ''">Wybrany filtr: {{this.$store.state.whitelist.name}}</a>
     <a v-else> Brak wybranego filtru</a>
     <div class="dropdown-content">
       <a v-for="(data,index) in this.$store.state.whitelists" :key='index'>
-          <a v-on:click="submitWhitelist(data)">{{data}}</a>
+          <a v-on:click="submitWhitelist(data)">{{data.name}}</a>
       </a>
-      <a><a>Dodaj filtr</a></a>
+      <router-link to="/filters">Zarządzaj filtrami</router-link>
     </div>
   </li>
   <li class="dropdown">
-   <a class="dropbtn">Wybrana sala: {{this.$store.state.rooms[this.$store.state.room].name}}</a>
+   <a  v-if="this.$store.state.room !== 3333" class="dropbtn">Wybrana sala: {{this.$store.state.rooms[this.$store.state.room].name}}</a>
+    <a v-else>Brak wybranej sali</a>
     <div class="dropdown-content">
       <a  v-for="(data,index) in this.$store.state.rooms" :key='index' >
           <a v-on:click="submitRoom(data.id)">{{data.name}}</a>
@@ -30,6 +34,8 @@
 </template>
 
 <script>
+import Link from 'vue-router'
+
 export default {
         name: 'TopMenu',
         data () {

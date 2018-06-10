@@ -1,5 +1,5 @@
 <template>
-    <div class="student-info" v-bind:class="{ opened: this.$store.state.student != null }">
+    <div class="student-info" v-bind:class="{ opened: Object.values(this.$store.state.student) != 0 }">
         <h1>{{this.$store.state.student.name}}</h1>
         <span class="processess">
             <h2>Uruchomione procesy:</h2>
