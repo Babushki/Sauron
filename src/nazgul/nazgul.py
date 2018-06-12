@@ -13,6 +13,7 @@ import logging.config
 
 import psutil
 import requests
+import requests.auth
 
 
 logging.config.fileConfig('logging.conf')
@@ -75,6 +76,7 @@ class Nazgul:
             'server communication': Timer(datetime.timedelta(
                 seconds=config['time period']['server communication']))}
         self.processes = []
+        self.auth = requests.auth.HTTPBasicAuth(self.name, self.config['password'])
 
     def run(self):
         """Runs Nazgul application"""
@@ -91,17 +93,17 @@ class Nazgul:
                              collected_processes['create_time'])
             if self.timers['server communication'].countdown_over():
                 self.timers['server communication'].restart()
-                logging.info('sending %s process collections to server', len(self.processes))
-                self.processes = [p for p in self.processes
-                                  if self._send_processes_to_server(p)]
-                logging.info('%s process collections sent to server successfully',
-                             len(self.processes))
+                logging.info('sending collection of processes to server')
+                if self._send_processes_to_server(self.processes):
+                    self.processes.clear()
+                else:
+                    logging.info('collection of processes sent to server unsuccessfully')
 
     def _send_processes_to_server(self, processes):
         url = '{0[protocol]}://{0[address]}:{0[port]}{0[process_endpoint]}'.format(
             self.config['server'])
         # logging.debug('sending to: %s', url)
-        response = requests.post(url, json=processes)
+        response = requests.post(url, json=processes, auth=self.auth)
         if not response.ok:
             logging.error('response: %s %s', response.status_code, response.reason)
         return response.ok

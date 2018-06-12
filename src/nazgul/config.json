@@ -6,6 +6,7 @@
         "process_endpoint": "/api/process/"
     },
     "name": "name",
+    "password": "1234",
     "group": "group",
     "time period": {
         "processes collecting": 30,
