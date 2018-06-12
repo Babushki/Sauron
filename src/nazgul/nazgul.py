@@ -6,11 +6,15 @@ executed in the OS, and what websites are visited by currently logged
 user, and then sends them to the server of the Sauron system.
 """
 
+import collections
 import datetime
 import json
 import logging
 import logging.config
+import os
+import os.path
 
+import mss
 import psutil
 import requests
 import requests.auth
@@ -74,9 +78,21 @@ class Nazgul:
             'processes collecting': Timer(datetime.timedelta(
                 seconds=config['time period']['processes collecting'])),
             'server communication': Timer(datetime.timedelta(
-                seconds=config['time period']['server communication']))}
+                seconds=config['time period']['server communication'])),
+            'screenshot': Timer(datetime.timedelta(seconds=30))}
         self.processes = []
+        self.screenshooter = mss.mss()
+        self.screenshots_to_send = []
         self.auth = requests.auth.HTTPBasicAuth(self.name, self.config['password'])
+
+    def _shoot_screenshot(self):
+        screenshots_directory = os.path.join(os.path.curdir, 'screenshots')
+        os.makedirs(screenshots_directory, exist_ok=True)
+        current_datetime = datetime.datetime.utcnow()
+        filename = '{}-{}-{:%Y%m%d%H%M%S}.png'.format(self.name, self.config['group'], current_datetime)
+        filepath = os.path.join(screenshots_directory, filename)
+        self.screenshooter.shot(mon=-1, output=filepath)
+        return collections.namedtuple('ScreenshotFile', 'filepath, create_time')._make([filepath, current_datetime.timestamp()])
 
     def run(self):
         """Runs Nazgul application"""
@@ -91,6 +107,10 @@ class Nazgul:
                 logging.info('%s processes collected at %s (utc)',
                              len(collected_processes['processes']),
                              collected_processes['create_time'])
+            if self.timers['screenshot'].countdown_over():
+                self.timers['screenshot'].restart()
+                logging.info('shooting screenshot')
+                self.screenshots_to_send.append(self._shoot_screenshot())
             if self.timers['server communication'].countdown_over():
                 self.timers['server communication'].restart()
                 logging.info('sending collection of processes to server')
@@ -98,6 +118,12 @@ class Nazgul:
                     self.processes.clear()
                 else:
                     logging.info('collection of processes sent to server unsuccessfully')
+                logging.info('sending %s screenshots to server', len(self.screenshots_to_send))
+                self.screenshots_to_send = [s for s in self.screenshots_to_send
+                                            if not self._send_screenshot(s)]
+                if self.screenshots_to_send:
+                    logging.error('%s screenshots sent to server unsuccessfully',
+                                  len(self.screenshots_to_send))
 
     def _send_processes_to_server(self, processes):
         url = '{0[protocol]}://{0[address]}:{0[port]}{0[process_endpoint]}'.format(
@@ -108,6 +134,8 @@ class Nazgul:
             logging.error('response: %s %s', response.status_code, response.reason)
         return response.ok
 
+    def _send_screenshot(self, screenshot):
+        pass
 
 def main():
     """Main function"""
