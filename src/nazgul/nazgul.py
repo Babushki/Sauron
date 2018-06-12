@@ -69,17 +69,18 @@ class Nazgul:
             logging.warning(
                 "no 'name' property in the config; assigned current user name (%s)",
                 self.name)
-        self.processes_collecting_timer = Timer(datetime.timedelta(
-            seconds=config['time period']['processes collecting']))
-        self.server_communication_timer = Timer(datetime.timedelta(
-            seconds=config['time period']['server communication']))
+        self.timers = {
+            'processes collecting': Timer(datetime.timedelta(
+                seconds=config['time period']['processes collecting'])),
+            'server communication': Timer(datetime.timedelta(
+                seconds=config['time period']['server communication']))}
         self.processes = []
 
     def run(self):
         """Runs Nazgul application"""
         while True:
-            if self.processes_collecting_timer.countdown_over():
-                self.processes_collecting_timer.restart()
+            if self.timers['processes collecting'].countdown_over():
+                self.timers['processes collecting'].restart()
                 collected_processes = {'nazgul': self.name,
                                        'group': self.config['group'],
                                        'processes': _get_current_processes(),
@@ -88,8 +89,8 @@ class Nazgul:
                 logging.info('%s processes collected at %s (utc)',
                              len(collected_processes['processes']),
                              collected_processes['create_time'])
-            if self.server_communication_timer.countdown_over():
-                self.server_communication_timer.restart()
+            if self.timers['server communication'].countdown_over():
+                self.timers['server communication'].restart()
                 logging.info('sending %s process collections to server', len(self.processes))
                 self.processes = [p for p in self.processes
                                   if self._send_processes_to_server(p)]
