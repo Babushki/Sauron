@@ -91,7 +91,7 @@ class Nazgul:
         filename = '{}-{}-{:%Y%m%d%H%M%S}.png'.format(self.name, self.config['group'], current_datetime)
         filepath = os.path.join(screenshots_directory, filename)
         self.screenshooter.shot(mon=-1, output=filepath)
-        return collections.namedtuple('ScreenshotFile', 'filepath, create_time')._make([filepath, current_datetime.timestamp()])
+        return collections.namedtuple('ScreenshotFile', 'filepath, create_time')._make([filepath, int(current_datetime.timestamp())])
 
     def run(self):
         """Runs Nazgul application"""
@@ -101,7 +101,8 @@ class Nazgul:
                 collected_processes = {'nazgul': self.name,
                                        'group': self.config['group'],
                                        'processes': _get_current_processes(),
-                                       'create_time': datetime.datetime.now().utcnow().timestamp()}
+                                       'create_time': int(datetime.datetime.utcnow().timestamp()),
+                                       'alarm': False}
                 self.processes.append(collected_processes)
                 logging.info('%s processes collected at %s (utc)',
                              len(collected_processes['processes']),
