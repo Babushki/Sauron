@@ -33,13 +33,13 @@ class UserService:
 
 
     @cherrypy.tools.json_in()
-    def PUT(self):
+    def PUT(self, login):
         request = cherrypy.request.json
         with COLLECTIONS['users'] as col:
             try:
                 user = col.find_one({'login': cherrypy.request.login})
                 if user['account_type'] == 'superadmin':
-                    col.update_many({'login': request['login']}, {'$set': {'password': request['password'], 'account_type': request['account_type']}})
+                    col.update_many({'login': login}, {'$set': {'password': request['password'], 'account_type': request['account_type']}})
                 else:
                     raise cherrypy.HTTPError(401, 'Unauthorized')
             except(KeyError, TypeError) :
