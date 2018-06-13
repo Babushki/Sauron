@@ -40,7 +40,7 @@ class ProcessService:
                     for r in request:
                         col.insert_one({
                             'create_time': r['create_time'],
-                            'nazgul': r['nazgul'],
+                            'nazgul': cherrypy.request.login,
                             'processes': r['processes'],
                             'group': r['group'],
                         })

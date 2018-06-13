@@ -23,7 +23,7 @@ class ScreenshotService:
         filename = group + '_' + nazgul + '_' + create_time
         with COLLECTIONS['users'] as col:
             user = col.find_one({'login': cherrypy.request.login})
-        if user['account_type'] in ('nazgul', 'superadmin'):
+        if user['account_type'] in ('nazgul',):
 
             data = screenshot.file.read()
 
@@ -48,7 +48,7 @@ class ScreenshotListService:
     def GET(self, time_from = None, time_to = None, nazgul = None, group = None, newest = False):
         with COLLECTIONS['users'] as col:
             user = col.find_one({'login': cherrypy.request.login})
-        if user['account_type'] in ('nazgul', 'superadmin'):
+        if user['account_type'] in ('user', 'superadmin'):
             query = {}
             if time_from and time_to:
                 query.update({'create_time': {'$lt': int(time_to), '$gte': int(time_from)}})
@@ -56,6 +56,7 @@ class ScreenshotListService:
                 query.update({'nazgul': str(nazgul)})
             if group:
                 query.update({'group': str(group)})
-            #TODO
+            with COLLECTIONS['screenshots'] as col:
+                return list(col.find(query, {'_id': False}))
         else:
             raise cherrypy.HTTPError(401, 'Unauthorized')

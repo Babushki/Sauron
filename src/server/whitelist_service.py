@@ -8,13 +8,20 @@ from base64 import b64encode
 class WhitelistService:
 
     @cherrypy.tools.json_out()
-    def GET(self, only_active = True):
-        try:
-            query = {'active': True} if bool(int(only_active)) else {}
-        except ValueError:
-            raise cherrypy.HTTPError(400, 'Bad Request')
-        with COLLECTIONS['whitelists'] as col:
-            return list(col.find(query, {'_id': False}))
+    def GET(self, only_active = True, group = None):
+        with COLLECTIONS['users'] as col:
+            user = col.find_one({'login': cherrypy.request.login})
+        if user['account_type'] in ('superadmin', 'user', 'nazgul'):
+            try:
+                query = {'active': True} if bool(int(only_active)) else {}
+                if group:
+                    query.update({'group': str(group)})
+            except ValueError:
+                raise cherrypy.HTTPError(400, 'Bad Request')
+            with COLLECTIONS['whitelists'] as col:
+                return list(col.find(query, {'_id': False}))
+        else:
+            raise cherrypy.HTTPError(401, 'Unauthorized')
 
     @cherrypy.tools.json_in()
     def POST(self):
@@ -29,6 +36,7 @@ class WhitelistService:
                         'active': False,
                         'processes': request['processes'],
                         'domains': request['domains'],
+                        'group': request['group'],
                     })
                 except (KeyError, TypeError):
                     raise cherrypy.HTTPError(400, 'Bad Request')
