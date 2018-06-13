@@ -25,6 +25,9 @@ class UserService:
                 user = col.find_one({'login': cherrypy.request.login})
                 if user['account_type'] == 'superadmin':
                     request = cherrypy.request.json
+                    duplicate = col.find_one({'login': request['login']})
+                    if duplicate:
+                        raise cherrypy.HTTPError(409, 'Login already in use')
                     col.insert_one({'login': request['login'], 'password': request['password'], 'account_type': request['account_type']})
                 else:
                     raise cherrypy.HTTPError(401, 'Unauthorized')
@@ -74,4 +77,4 @@ class NazgulListService:
             users = set()
             for p in processes:
                 users.add(p['nazgul'])
-            return users
+            return list(users)
