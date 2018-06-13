@@ -1,5 +1,5 @@
 import cherrypy
-from user_service import UserService, NazgulListService, UserListService
+from user_service import UserService, NazgulListService
 from process_service import ProcessService
 from whitelist_service import WhitelistService
 from screenshot_service import ScreenshotService, ScreenshotListService
