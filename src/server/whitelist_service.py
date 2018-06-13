@@ -8,7 +8,7 @@ from base64 import b64encode
 class WhitelistService:
 
     @cherrypy.tools.json_out()
-    def GET(self, only_active = True, group = None):
+    def GET(self, only_active = True, group = None, user = None):
         with COLLECTIONS['users'] as col:
             user = col.find_one({'login': cherrypy.request.login})
         if user['account_type'] in ('superadmin', 'user', 'nazgul'):
@@ -16,6 +16,8 @@ class WhitelistService:
                 query = {'active': True} if bool(int(only_active)) else {}
                 if group:
                     query.update({'group': str(group)})
+                if user:
+                    query.update({'user': str(user)})
             except ValueError:
                 raise cherrypy.HTTPError(400, 'Bad Request')
             with COLLECTIONS['whitelists'] as col:
@@ -37,6 +39,7 @@ class WhitelistService:
                         'processes': request['processes'],
                         'domains': request['domains'],
                         'group': request['group'],
+                        'user': cherrypy.request.login,
                     })
                 except (KeyError, TypeError):
                     raise cherrypy.HTTPError(400, 'Bad Request')
