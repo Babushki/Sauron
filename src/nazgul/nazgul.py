@@ -128,7 +128,11 @@ class Nazgul:
     def _send_processes_to_server(self, processes):
         url = '{0[hostname]}{0[process_endpoint]}'.format(self.config['server'])
         # logging.debug('sending to: %s', url)
-        response = requests.post(url, json=processes, auth=self.auth)
+        try:
+            response = requests.post(url, json=processes, auth=self.auth)
+        except requests.exceptions.ConnectionError as e:
+            logging.error(e)
+            return False
         if not response.ok:
             logging.error('response: %s %s', response.status_code, response.reason)
         return response.ok
