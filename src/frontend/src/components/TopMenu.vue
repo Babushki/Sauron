@@ -15,12 +15,11 @@
     </div>
   </li>
   <li class="dropdown">
-   <a  v-if="this.$store.state.room !== 3333" class="dropbtn">Wybrana sala: {{this.$store.state.rooms[this.$store.state.room].name}}</a>
+   <a  v-if="this.$store.state.room !== ''" class="dropbtn">Wybrana sala: {{this.$store.state.room}}</a>
     <a v-else>Brak wybranej sali</a>
     <div class="dropdown-content">
-      <a  v-for="(data,index) in this.$store.state.rooms" :key='index' >
-          <a v-on:click="submitRoom(data.id)">{{data.name}}</a>
-      </a>
+      <input  v-model="selected" >
+      <a class="btn" type="submit" v-on:click="submitRoom(selected)" > Wejdź do sali</a>
     </div>
   </li>
   <li style="float:right">
@@ -53,8 +52,8 @@ export default {
                     this.$router.push('/')
                 })
             },
-            submitRoom: function(room){
-            this.$store.dispatch("chooseRoom", room).then(()=>
+            submitRoom: function(){
+            this.$store.dispatch("chooseRoom", this.selected).then(()=>
             {
                 console.log(this.$store.state.room);
             })

@@ -17,7 +17,7 @@ export default new Vuex.Store({
     errorTimeout: {},
     logged: false,
     rooms: [],
-    room: 3333,
+    room: "",
     whitelists: [],
     whitelist: "",
     editWhitelist: {},
@@ -95,24 +95,11 @@ export default new Vuex.Store({
     },
     fetchRooms(context) {
       return new Promise((resolve, reject) => {
-        context.commit('LOADING', true)
-        axios
-          .get("http://localhost:3333/groups")
-          .then(res => {
-            context.commit('UPDATE_ROOMS', res.data)
-            context.commit('LOADING', false)
-            resolve()
-          })
-          .catch(() => {
-            context.commit('ERROR', 'Nie udało się pobrać listy grup')
-            context.commit('LOADING', false)
-            reject()
-          });
+        context.commit('LOADING', true)        
       })
     },
     chooseRoom(context, roomName) {
       context.commit('CHANGE_ROOM', roomName)
-      context.commit('UPDATE_STUDENTS', this.state.rooms[this.state.room].students)
     },
     fetchWhitelists(context) {
       return new Promise((resolve, reject) => {
@@ -176,6 +163,19 @@ export default new Vuex.Store({
     fetchStudents(context) {
       return new Promise((resolve, reject) => {
         context.commit('LOADING', true)
+        axios
+          .get("localhost:3333/api/nazgul?time_from=0&group=m216")
+          .then(res => {
+            context.commit('UPDATE_STUDENTS', res.data)
+            context.commit('LOADING', false)
+            console.log(res.data)
+            resolve()
+          })
+          .catch(() => {
+            context.commit('ERROR', 'Nie udało się pobrać listy studentów')
+            context.commit('LOADING', false)
+            reject()
+          });
         context.commit('LOADING', false)
         resolve()
       })

@@ -1,7 +1,7 @@
 <template>
       <div class="body-container">
         <div class="students-list">
-          <h1 v-if="this.$store.state.room"> Aktualnie podłączeni użytkownicy do sali {{this.$store.state.rooms[this.$store.state.room].name}}</h1>
+          <h1 v-if="this.$store.state.room"> Aktualnie podłączeni użytkownicy do sali {{this.$store.state.room}}</h1>
           <h1 v-else>Brak wybranej sali</h1>
 
           <table class="table table-striped table-borderes">

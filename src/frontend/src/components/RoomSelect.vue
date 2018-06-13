@@ -8,12 +8,9 @@
     <div class="header-content text-md-center">
         <center>
           <h1>Witaj w aplikacji Sauron!</h1>
-          <h2> Wybierz salę do monitorowania:</h2>
+          <h2> Wpisz grupę do monitorowania:</h2>
       
-      <select  v-model="selected" >
-        <option value="" disabled selected>...</option>
-        <option  v-for="(data,index) in this.$store.state.rooms" :key='index' v-bind:value="data.id"> {{data.name}}</option>
-      </select>
+      <input  v-model="selected" >
       
       <a class="btn" type="submit" v-on:click="submit" > Wejdź do sali</a>
         </center>
