@@ -73,20 +73,23 @@ export default new Vuex.Store({
         context.commit('LOADING', true)
         context.commit('LOGIN', false)
 
-        // call api to login with credentials.login and credentials.password
+        let authorization = 'Basic ' + window.btoa(`${credentials.login}:${credentials.password}`)
+        window.sessionStorage.setItem('Authorization', authorization)
 
-        setTimeout(() => {
-          if (credentials.login === validCredentials.login && credentials.password === validCredentials.password) {
-            window.sessionStorage.setItem('Authorization', 'dawkon1oi2nt')
+        axios
+          .get("http://www.iraminius.pl/sauron/api/auth", {
+            headers: {'Authorization': window.sessionStorage.getItem('Authorization')}
+          })
+          .then(res => {
             context.commit('LOGIN', true)
+            context.commit('LOADING', false)
             resolve()
-          } else {
-            context.commit('ERROR', "Logowanie nie powiodło się")
+          })
+          .catch(() => {
+            context.commit('ERROR', 'Nie udało się pobrać listy grup')
+            context.commit('LOADING', false)
             reject()
-          }
-
-          context.commit('LOADING', false)
-        }, 2500)
+          });
       })
     },
     logout(context) {
