@@ -75,8 +75,7 @@ class Nazgul:
                 "no 'name' property in the config; assigned current user name (%s)",
                 self.name)
         self.timers = {
-            'processes collecting': Timer(datetime.timedelta(
-                seconds=config['time period']['processes collecting'])),
+            'processes collecting': Timer(datetime.timedelta(seconds=5)),
             'server communication': Timer(datetime.timedelta(
                 seconds=config['time period']['server communication'])),
             'screenshot': Timer(datetime.timedelta(seconds=30))}
