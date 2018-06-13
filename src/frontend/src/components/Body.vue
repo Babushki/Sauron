@@ -13,9 +13,8 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-bind:key="student.id" v-for="student in $store.state.students" >
-                <td>{{student.id}}</td>
-                <td>{{student.name}}</td>
+              <tr v-for="(student,index) in this.$store.state.students" :key='index' >
+                <td>{{student}}</td>
                 <td>
                   <button v-on:click="$store.dispatch('chooseStudent', student)">Podgląd</button>
                   <button v-on:click="$store.dispatch('chooseStudent', student)">Zbanuj</button>

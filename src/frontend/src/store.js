@@ -164,7 +164,7 @@ export default new Vuex.Store({
       return new Promise((resolve, reject) => {
         context.commit('LOADING', true)
         axios
-          .get("localhost:3333/api/nazgul?time_from=0&group=m216")
+          .get("localhost:3333/api/nazgul?time_from=0&group="+this.state.room)
           .then(res => {
             context.commit('UPDATE_STUDENTS', res.data)
             context.commit('LOADING', false)
@@ -181,7 +181,39 @@ export default new Vuex.Store({
       })
     },
     chooseStudent(context, selectedStudent) {
+      context.commit('LOADING', true)
       context.commit('CHANGE_STUDENT', selectedStudent)
+      axios
+          .get("localhost:3333/api/process?time_from=0&nazgul="+this.student.student)
+          .then(res => {
+            context.commit('UPDATE_STUDENTS', res.data)
+            context.commit('LOADING', false)
+            console.log(res.data)
+            resolve()
+          })
+          .catch(() => {
+            context.commit('ERROR', 'Nie udało się uaktualnić procesów studenta')
+            context.commit('LOADING', false)
+            reject()
+          });
+    },
+    updateStudents(context){
+      setInterval(function(){
+        axios
+        .get("localhost:3333/api/process?time_from=0")
+        .then(res => {
+          context.commit('UPDATE_STUDENTS', res.data)
+          context.commit('LOADING', false)
+          console.log(res.data)
+          resolve()
+        })
+        .catch(() => {
+          context.commit('ERROR', 'Nie udało się uaktualnić listy procesów')
+          context.commit('LOADING', false)
+          reject()
+        });
+      }, 2000)
+      
     }
   }
 })
