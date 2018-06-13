@@ -1,8 +1,6 @@
 {
     "server": {
-        "protocol": "http",
-        "address": "127.0.0.1",
-        "port": 8080,
+        "hostname": "http://127.0.0.1:8080",
         "process_endpoint": "/api/process/"
     },
     "name": "name",

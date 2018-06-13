@@ -126,8 +126,7 @@ class Nazgul:
                                   len(self.screenshots_to_send))
 
     def _send_processes_to_server(self, processes):
-        url = '{0[protocol]}://{0[address]}:{0[port]}{0[process_endpoint]}'.format(
-            self.config['server'])
+        url = '{0[hostname]}{0[process_endpoint]}'.format(self.config['server'])
         # logging.debug('sending to: %s', url)
         response = requests.post(url, json=processes, auth=self.auth)
         if not response.ok:
