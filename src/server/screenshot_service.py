@@ -20,7 +20,7 @@ class ScreenshotService:
             raise cherrypy.HTTPError(401, 'Unauthorized')
 
     def POST(self, screenshot, create_time, group):
-        filename = group + '_' + nazgul + '_' + create_time
+        filename = group + '_' + cherrypy.request.login + '_' + create_time
         with COLLECTIONS['users'] as col:
             user = col.find_one({'login': cherrypy.request.login})
         if user['account_type'] in ('nazgul',):
