@@ -19,7 +19,7 @@ class ScreenshotService:
         else:
             raise cherrypy.HTTPError(401, 'Unauthorized')
 
-    def POST(self, screenshot, create_time, nazgul, group):
+    def POST(self, screenshot, create_time, group):
         filename = group + '_' + nazgul + '_' + create_time
         with COLLECTIONS['users'] as col:
             user = col.find_one({'login': cherrypy.request.login})
@@ -35,7 +35,7 @@ class ScreenshotService:
                 col.insert_one({
                     'filename': filename,
                     'group': group,
-                    'nazgul': nazgul,
+                    'nazgul': cherrypy.request.login,
                     'create_time': int(create_time),
                 })
         else:
@@ -66,7 +66,7 @@ class ScreenshotListService:
                                 result[s['nazgul']] = s
                         else:
                             result[s['nazgul']] = s
-                    return result.values()
+                    return list(result.values())
                 else:
                     return screens
 
