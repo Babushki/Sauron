@@ -2,7 +2,8 @@
     "server": {
         "hostname": "http://127.0.0.1:8080",
         "process_endpoint": "/api/process/",
-        "screenshots_endpoint": "/api/screenshot/"
+        "screenshots_endpoint": "/api/screenshot/",
+        "whitelist_endpoint": "/api/whitelist/"
     },
     "name": "name",
     "password": "1234",

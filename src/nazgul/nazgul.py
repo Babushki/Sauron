@@ -46,6 +46,13 @@ def _get_current_processes():
                              'create_time']) for p in psutil.process_iter()]
 
 
+def _update_alarms(whitelisted_processes, processes):
+    for p in processes:
+        any_alarm_occurred = p['name'] not in whitelisted_processes
+        p.update({'alarm': any_alarm_occurred})
+    return any_alarm_occurred
+
+
 class Timer:
     """Class implementing functionality of the simple timer"""
 
@@ -80,6 +87,7 @@ class Nazgul:
                 seconds=config['time period']['server communication'])),
             'screenshot': Timer(datetime.timedelta(seconds=30))}
         self.processes = []
+        self.whitelist = {}
         self.screenshooter = mss.mss()
         self.screenshots_to_send = []
         self.auth = requests.auth.HTTPBasicAuth(self.name, self.config['password'])
@@ -95,14 +103,19 @@ class Nazgul:
 
     def run(self):
         """Runs Nazgul application"""
+        logging.info('getting whitelist from server for the first time')
+        if not self._update_whitelist():
+            logging.error('getting whitelist unsuccessfully')
         while True:
             if self.timers['processes collecting'].countdown_over():
                 self.timers['processes collecting'].restart()
+                processes = _get_current_processes()
+                any_alarm_occured = _update_alarms(self.whitelist['processes'], processes)
                 collected_processes = {'nazgul': self.name,
                                        'group': self.config['group'],
-                                       'processes': _get_current_processes(),
+                                       'processes': processes,
                                        'create_time': int(datetime.datetime.utcnow().timestamp()),
-                                       'alarm': False}
+                                       'alarm': any_alarm_occured}
                 self.processes.append(collected_processes)
                 logging.info('%s processes collected at %s (utc)',
                              len(collected_processes['processes']),
@@ -113,6 +126,9 @@ class Nazgul:
                 self.screenshots_to_send.append(self._shoot_screenshot())
             if self.timers['server communication'].countdown_over():
                 self.timers['server communication'].restart()
+                logging.info('updating whitelist from server')
+                if not self._update_whitelist():
+                    logging.error('updating whitelist unsuccessfully')
                 logging.info('sending collection of processes to server')
                 if self._send_processes_to_server(self.processes):
                     self.processes.clear()
@@ -152,6 +168,23 @@ class Nazgul:
             if not response.ok:
                 logging.error('response: %s %s', response.status_code, response.reason)
             return response.ok
+
+    def _update_whitelist(self):
+        url = '{0[hostname]}{0[whitelist_endpoint]}'.format(self.config['server'])
+        logging.debug('getting from: %s', url)
+        params = {
+            'group': self.config['group']}
+        try:
+            response = requests.get(url, params=params, auth=self.auth)
+        except requests.exceptions.ConnectionError as e:
+            logging.error(e)
+            return False
+        if response.ok:
+            self.whitelist = json.loads(response.content.decode())[0]
+        else:
+            logging.error('response: %s %s', response.status_code, response.reason)
+        return response.ok
+
 
 
 def main():
