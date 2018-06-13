@@ -74,3 +74,17 @@ class NazgulListService:
             for p in processes:
                 users.add(p['nazgul'])
             return users
+
+@cherrypy.expose
+class UserListService:
+
+    @cherrypy.tools.json_out()
+    def GET(self):
+        with COLLECTIONS['users'] as col:
+            user = col.find_one({'login': cherrypy.request.login})
+        if user['account_type'] in ('superadmin',):
+            with COLLECTIONS['users'] as col:
+                users = list(col.find({}, {'_id': False}))
+            return users
+        else:
+            raise cherrypy.HTTPError(401, 'Unauthorized')
