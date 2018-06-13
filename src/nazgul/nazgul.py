@@ -138,7 +138,21 @@ class Nazgul:
         return response.ok
 
     def _send_screenshot(self, screenshot):
-        pass
+        with open(screenshot.filepath, 'rb') as file:
+            url = '{0[hostname]}{0[screenshots_endpoint]}'.format(self.config['server'])
+            logging.debug('sending to: %s', url)
+            params = {
+                'create_time': screenshot.create_time,
+                'group': self.config['group']}
+            try:
+                response = requests.post(url, files={'screenshot': file.read()}, params=params, auth=self.auth)
+            except requests.exceptions.ConnectionError as e:
+                logging.error(e)
+                return False
+            if not response.ok:
+                logging.error('response: %s %s', response.status_code, response.reason)
+            return response.ok
+
 
 def main():
     """Main function"""
