@@ -16,7 +16,7 @@
               <tr v-for="(student,index) in this.$store.state.students" :key='index' >
                 <td>{{student.nazgul}}</td>
                 <td>
-                  <button v-on:click="$store.dispatch('chooseStudent', student.nazgul)">Podgląd</button>
+                  <button v-on:click="$store.dispatch('chooseStudent', student)">Podgląd</button>
                 </td>
               </tr>
             </tbody>

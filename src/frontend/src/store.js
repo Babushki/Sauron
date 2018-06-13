@@ -4,11 +4,6 @@ import axios from 'axios'
 
 Vue.use(Vuex)
 
-const validCredentials = {
-  login: 'ppiesiak',
-  password: 'dupa'
-}
-
 export default new Vuex.Store({
   state: {
     loading: false,
@@ -22,8 +17,7 @@ export default new Vuex.Store({
     whitelist: "",
     editWhitelist: {},
     students: [],
-    student: "",
-    oneStudent: {}
+    student: {}
   },
   mutations: {
     LOGIN(state, data) {
@@ -66,10 +60,6 @@ export default new Vuex.Store({
     },
     CHANGE_STUDENT(state, student) {
       state.student = student
-    },
-    CHANGE_ONE_STUDENT(state, oneStudent){
-      state.oneStudent = oneStudent
-      console.log(state.oneStudent)
     }
   },
   actions: {
@@ -91,7 +81,7 @@ export default new Vuex.Store({
             resolve()
           })
           .catch(() => {
-            context.commit('ERROR', 'Nie udało się pobrać listy grup')
+            context.commit('ERROR', 'Niepoprawne dane logowania')
             context.commit('LOADING', false)
             reject()
           });
@@ -175,12 +165,37 @@ export default new Vuex.Store({
           .get("http://www.iraminius.pl/sauron/api/process", {
             headers: {'Authorization': window.sessionStorage.getItem('Authorization')},
             params:{
+              time_from: (Date.now() / 1000 - 7200 - 5).toFixed(0),
+              time_to: (Date.now() / 1000 - 7200).toFixed(0),
               group: this.state.room
             }
           })
           .then(res => {
-            context.commit('UPDATE_STUDENTS', res.data)
+            let students = []
+
+            res.data.forEach(nazgulFrame => {
+              let studentIndex = students.findIndex(student => {
+                return student.nazgul === nazgulFrame.nazgul
+              })
+
+              if (studentIndex === -1) {
+                students.push(nazgulFrame)
+              } else {
+                let alarm = students[studentIndex].alarm == true || nazgulFrame.alarm == true
+
+                if (nazgulFrame.create_time > students[studentIndex].create_time) {
+                  students[studentIndex] = nazgulFrame
+                }
+
+                students[studentIndex].alarm = alarm
+              }
+            })
+
+            context.dispatch('updateStudents')
+
+            context.commit('UPDATE_STUDENTS', students)
             context.commit('LOADING', false)
+
             resolve()
           })
           .catch(() => {
@@ -194,50 +209,59 @@ export default new Vuex.Store({
     },
     chooseStudent(context, selectedStudent) {
       return new Promise((resolve, reject) => {
-      context.commit('LOADING', true)
-      context.commit('CHANGE_STUDENT', selectedStudent)
-      axios
-          .get("http://www.iraminius.pl/sauron/api/process", {
-            headers: {'Authorization': window.sessionStorage.getItem('Authorization')},
-            params:{
-              nazgul: this.state.student,
-              time_from: 0
-            }
-          })
-          .then(res => {
-            context.commit('CHANGE_ONE_STUDENT', res.data)
-            context.commit('LOADING', false)
-            resolve()
-          })
-          .catch(() => {
-            context.commit('ERROR', 'Nie udało się uaktualnić procesów studenta')
-            context.commit('LOADING', false)
-            reject()
-          });
+        let studentIndex = context.state.students.findIndex(student => {
+          return student.nazgul === selectedStudent.nazgul
         })
+
+        context.commit('CHANGE_STUDENT', studentIndex)
+      })
     },
     updateStudents(context){
-      setInterval(function(){
-        axios
-        .get("http://www.iraminius.pl/sauron/api/process", {
-          headers: {'Authorization': window.sessionStorage.getItem('Authorization')},
-          params:{
-            time_from: 0
-          }
-        })
-        .then(res => {
-          context.commit('UPDATE_STUDENTS', res.data)
+      setInterval(() => {
+        return new Promise((resolve, reject) => {
+          context.commit('LOADING', true)
+          axios
+            .get("http://www.iraminius.pl/sauron/api/process", {
+              headers: {'Authorization': window.sessionStorage.getItem('Authorization')},
+              params:{
+                time_from: (Date.now() / 1000 - 7200 - 5).toFixed(0),
+                time_to: (Date.now() / 1000 - 7200).toFixed(0),
+                group: this.state.room
+              }
+            })
+            .then(res => {
+              let students = []
+
+              res.data.forEach(nazgulFrame => {
+                let studentIndex = students.findIndex(student => {
+                  return student.nazgul === nazgulFrame.nazgul
+                })
+
+                if (studentIndex === -1) {
+                  students.push(nazgulFrame)
+                } else {
+                  let alarm = students[studentIndex].alarm == true || nazgulFrame.alarm == true
+
+                  if (nazgulFrame.create_time > students[studentIndex].create_time) {
+                    students[studentIndex] = nazgulFrame
+                  }
+
+                  students[studentIndex].alarm = alarm
+                }
+              })
+              context.commit('UPDATE_STUDENTS', students)
+              context.commit('LOADING', false)
+              resolve()
+            })
+            .catch(() => {
+              context.commit('ERROR', 'Nie udało się uaktualnić listy procesów')
+              context.commit('LOADING', false)
+              reject()
+            });
           context.commit('LOADING', false)
-          console.log(res.data)
           resolve()
         })
-        .catch(() => {
-          context.commit('ERROR', 'Nie udało się uaktualnić listy procesów')
-          context.commit('LOADING', false)
-          reject()
-        });
-      }, 2000)
-      
+      }, 5000)
     }
   }
 })
