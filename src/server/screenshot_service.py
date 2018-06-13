@@ -57,6 +57,18 @@ class ScreenshotListService:
             if group:
                 query.update({'group': str(group)})
             with COLLECTIONS['screenshots'] as col:
-                return list(col.find(query, {'_id': False}))
+                screens = list(col.find(query, {'_id': False}))
+                if newest:
+                    result = {}
+                    for s in screens:
+                        if result.get(s['nazgul']):
+                            if s['create_time'] > result[s['nazgul']]['create_time']:
+                                result[s['nazgul']] = s
+                        else:
+                            result[s['nazgul']] = s
+                    return result.values()
+                else:
+                    return screens
+
         else:
             raise cherrypy.HTTPError(401, 'Unauthorized')

@@ -39,10 +39,11 @@ class ProcessService:
                 try:
                     for r in request:
                         col.insert_one({
-                            'create_time': r['create_time'],
+                            'create_time': int(r['create_time']),
                             'nazgul': cherrypy.request.login,
                             'processes': r['processes'],
                             'group': r['group'],
+                            'alarm': r['alarm'],
                         })
                 except (KeyError, TypeError):
                     raise cherrypy.HTTPError(400, 'Bad Request')
