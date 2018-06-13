@@ -12,10 +12,10 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr v-bind:key="process.PID" v-for="process in this.$store.state.student.prosesses">
-                    <td>{{process.PID}}</td>
+                <tr v-bind:key="nazgul.processes.pid" v-for="nazgul in this.$store.state.oneStudent.processes">
+                    <td>{{process.pid}}</td>
                     <td>{{process.name}}</td>
-                    <td>{{process.user}}</td>
+                    <td>{{process.username}}</td>
                 </tr>
                 </tbody>
                 <br/>

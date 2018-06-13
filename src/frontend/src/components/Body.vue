@@ -7,17 +7,16 @@
           <table class="table table-striped table-borderes">
             <thead>
               <tr>
-                <th>Id:</th>
+                
                 <th>Nazwa:</th>
                 <th>Akcja:</th>
               </tr>
             </thead>
             <tbody>
               <tr v-for="(student,index) in this.$store.state.students" :key='index' >
-                <td>{{student}}</td>
+                <td>{{student.nazgul}}</td>
                 <td>
-                  <button v-on:click="$store.dispatch('chooseStudent', student)">Podgląd</button>
-                  <button v-on:click="$store.dispatch('chooseStudent', student)">Zbanuj</button>
+                  <button v-on:click="$store.dispatch('chooseStudent', student.nazgul)">Podgląd</button>
                 </td>
               </tr>
             </tbody>

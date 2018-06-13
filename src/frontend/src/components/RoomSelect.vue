@@ -32,6 +32,7 @@ export default {
   methods: {
     submit: function() {
       this.$store.dispatch("chooseRoom", this.selected);
+      this.$store.dispatch("fetchStudents");
     }
   }
 };

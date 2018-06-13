@@ -22,7 +22,8 @@ export default new Vuex.Store({
     whitelist: "",
     editWhitelist: {},
     students: [],
-    student: {}
+    student: "",
+    oneStudent: {}
   },
   mutations: {
     LOGIN(state, data) {
@@ -65,6 +66,10 @@ export default new Vuex.Store({
     },
     CHANGE_STUDENT(state, student) {
       state.student = student
+    },
+    CHANGE_ONE_STUDENT(state, oneStudent){
+      state.oneStudent = oneStudent
+      console.log(state.oneStudent)
     }
   },
   actions: {
@@ -167,11 +172,15 @@ export default new Vuex.Store({
       return new Promise((resolve, reject) => {
         context.commit('LOADING', true)
         axios
-          .get("localhost:3333/api/nazgul?time_from=0&group="+this.state.room)
+          .get("http://www.iraminius.pl/sauron/api/process", {
+            headers: {'Authorization': window.sessionStorage.getItem('Authorization')},
+            params:{
+              group: this.state.room
+            }
+          })
           .then(res => {
             context.commit('UPDATE_STUDENTS', res.data)
             context.commit('LOADING', false)
-            console.log(res.data)
             resolve()
           })
           .catch(() => {
@@ -184,14 +193,20 @@ export default new Vuex.Store({
       })
     },
     chooseStudent(context, selectedStudent) {
+      return new Promise((resolve, reject) => {
       context.commit('LOADING', true)
       context.commit('CHANGE_STUDENT', selectedStudent)
       axios
-          .get("localhost:3333/api/process?time_from=0&nazgul="+this.student.student)
+          .get("http://www.iraminius.pl/sauron/api/process", {
+            headers: {'Authorization': window.sessionStorage.getItem('Authorization')},
+            params:{
+              nazgul: this.state.student,
+              time_from: 0
+            }
+          })
           .then(res => {
-            context.commit('UPDATE_STUDENTS', res.data)
+            context.commit('CHANGE_ONE_STUDENT', res.data)
             context.commit('LOADING', false)
-            console.log(res.data)
             resolve()
           })
           .catch(() => {
@@ -199,11 +214,17 @@ export default new Vuex.Store({
             context.commit('LOADING', false)
             reject()
           });
+        })
     },
     updateStudents(context){
       setInterval(function(){
         axios
-        .get("localhost:3333/api/process?time_from=0")
+        .get("http://www.iraminius.pl/sauron/api/process", {
+          headers: {'Authorization': window.sessionStorage.getItem('Authorization')},
+          params:{
+            time_from: 0
+          }
+        })
         .then(res => {
           context.commit('UPDATE_STUDENTS', res.data)
           context.commit('LOADING', false)

@@ -44,7 +44,6 @@ export default {
         },
         mounted() {
              this.$store.dispatch('fetchWhitelists');
-             this.$store.dispatch('fetchRooms');
         },
         methods: {
             logout() {
@@ -53,10 +52,8 @@ export default {
                 })
             },
             submitRoom: function(){
-            this.$store.dispatch("chooseRoom", this.selected).then(()=>
-            {
-                console.log(this.$store.state.room);
-            })
+            this.$store.dispatch("chooseRoom", this.selected);
+            this.$store.dispatch("fetchStudents");
             },
             submitWhitelist: function(whitelist){
             this.$store.dispatch("chooseWhitelist", whitelist).then(()=>
