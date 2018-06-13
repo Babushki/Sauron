@@ -117,7 +117,7 @@ class Nazgul:
                 if self._send_processes_to_server(self.processes):
                     self.processes.clear()
                 else:
-                    logging.info('collection of processes sent to server unsuccessfully')
+                    logging.error('collection of processes sent to server unsuccessfully')
                 logging.info('sending %s screenshots to server', len(self.screenshots_to_send))
                 self.screenshots_to_send = [s for s in self.screenshots_to_send
                                             if not self._send_screenshot(s)]
