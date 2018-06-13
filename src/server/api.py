@@ -1,5 +1,5 @@
 import cherrypy
-from user_service import UserService, NazgulListService
+from user_service import UserService, NazgulListService, AuthService
 from process_service import ProcessService
 from whitelist_service import WhitelistService
 from screenshot_service import ScreenshotService, ScreenshotListService
@@ -14,6 +14,8 @@ if __name__ == '__main__':
     cherrypy.tree.mount(WhitelistService(), '/api/whitelist', WITH_AUTHENTICATION)
     cherrypy.tree.mount(ScreenshotService(), '/api/screenshot', WITH_AUTHENTICATION)
     cherrypy.tree.mount(ScreenshotListService(), '/api/screenshotlist', WITH_AUTHENTICATION)
+    cherrypy.tree.mount(AuthService(), '/api/auth', WITH_AUTHENTICATION)
+
 
 
     cherrypy.engine.start()

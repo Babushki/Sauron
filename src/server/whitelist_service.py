@@ -37,7 +37,6 @@ class WhitelistService:
                         'name': request['name'],
                         'active': False,
                         'processes': request['processes'],
-                        'domains': request['domains'],
                         'group': request['group'],
                         'user': cherrypy.request.login,
                     })
