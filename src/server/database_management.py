@@ -19,4 +19,5 @@ COLLECTIONS = {
     'users': Collection(DB_NAME, 'users'),
     'processes': Collection(DB_NAME, 'processes'),
     'whitelists': Collection(DB_NAME, 'whitelists'),
+    'screenshots': Collection(DB_NAME, 'screenshots'),
 }
