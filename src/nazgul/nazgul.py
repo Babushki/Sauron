@@ -74,10 +74,11 @@ class Nazgul:
 
     def __init__(self, config):
         self.config = config
+        self.current_user = _get_current_user()
         try:
             self.name = self.config['name']
         except KeyError:
-            self.name = _get_current_user()
+            self.name = self.current_user
             logging.warning(
                 "no 'name' property in the config; assigned current user name (%s)",
                 self.name)
@@ -91,6 +92,9 @@ class Nazgul:
         self.screenshooter = mss.mss()
         self.screenshots_to_send = []
         self.auth = requests.auth.HTTPBasicAuth(self.name, self.config['password'])
+
+    def _filter_processes(self, processes):
+        return [p for p in processes if p['username'] == self.current_user]
 
     def _shoot_screenshot(self):
         screenshots_directory = os.path.join(os.path.curdir, 'screenshots')
@@ -109,7 +113,7 @@ class Nazgul:
         while True:
             if self.timers['processes collecting'].countdown_over():
                 self.timers['processes collecting'].restart()
-                processes = _get_current_processes()
+                processes = self._filter_processes(_get_current_processes())
                 any_alarm_occured = _update_alarms(self.whitelist['processes'], processes)
                 collected_processes = {'nazgul': self.name,
                                        'group': self.config['group'],
