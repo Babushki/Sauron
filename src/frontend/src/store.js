@@ -276,7 +276,7 @@ export default new Vuex.Store({
           axios.get("http://www.iraminius.pl/sauron/api/screenshotlist",{
             headers: {'Authorization': window.sessionStorage.getItem('Authorization')},
             params:{
-                time_from: (Date.now() / 1000 - 7200 - 5).toFixed(0),
+                time_from: (Date.now() / 1000 - 7200 - 10).toFixed(0),
                 time_to: (Date.now() / 1000 - 7200).toFixed(0),
                 group: this.state.room,
                 nazgul: this.state.student.nazgul,
@@ -290,7 +290,7 @@ export default new Vuex.Store({
             .get("http://www.iraminius.pl/sauron/api/process", {
               headers: {'Authorization': window.sessionStorage.getItem('Authorization')},
               params:{
-                time_from: (Date.now() / 1000 - 7200 - 5).toFixed(0),
+                time_from: (Date.now() / 1000 - 7200 - 10).toFixed(0),
                 time_to: (Date.now() / 1000 - 7200).toFixed(0),
                 group: this.state.room
               }
