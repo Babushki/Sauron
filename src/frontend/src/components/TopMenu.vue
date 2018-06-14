@@ -39,7 +39,7 @@ export default {
         name: 'TopMenu',
         data () {
             return {
-                
+                selected: ""
             }
         },
         mounted() {
@@ -58,7 +58,7 @@ export default {
             submitWhitelist: function(whitelist){
             this.$store.dispatch("chooseWhitelist", whitelist).then(()=>
             {
-                console.log(this.$store.state.whitelist);
+                console.log(this.$store.state.whitelist.active);
             })
             }
         }

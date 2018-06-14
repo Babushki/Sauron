@@ -6,6 +6,8 @@
         <h2>Procesy:</h2>
         <textarea v-model="whitelistAllowed"></textarea>
         <button v-on:click="saveWhitelist()">Zapisz</button>
+        <h2>Grupa:</h2>
+        <input v-model="whitelistGroup"/>
     </div>
 </template>
 
@@ -33,7 +35,15 @@ export default {
           set(value) {
               this.$store.commit('updateEditWhitelistAllowed', value)
           }
-      }
+      },
+        whitelistGroup: {
+            get() {
+              return this.$store.state.editWhitelist.group
+          },
+          set(value) {
+              this.$store.commit('updateEditWhitelistGroup', value)
+          }
+        }
   }
 };
 </script>
