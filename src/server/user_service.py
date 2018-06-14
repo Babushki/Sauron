@@ -85,5 +85,5 @@ class AuthService:
     def GET(self):
         with COLLECTIONS['users'] as col:
             user = col.find_one({'login': cherrypy.request.login})
-        if user['account_type'] not in ('superadmin', 'user', 'nazgul'):
+        if user['account_type'] not in ('superadmin', 'user'):
             raise cherrypy.HTTPError(401, 'Unauthorized')

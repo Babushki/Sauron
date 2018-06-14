@@ -20,7 +20,6 @@ class WhitelistService:
                     query.update({'group': str(group)})
                 if user:
                     query.update({'user': str(user)})
-                print(query)
             except ValueError:
                 raise cherrypy.HTTPError(400, 'Bad Request')
             with COLLECTIONS['whitelists'] as col:
