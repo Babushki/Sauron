@@ -18,7 +18,8 @@ export default new Vuex.Store({
     editWhitelist: {},
     students: [],
     student: {},
-    userName: ""
+    userName: "",
+    studentsScreenshots: {}
   },
   mutations: {
     LOGIN(state, data) {
@@ -65,23 +66,27 @@ export default new Vuex.Store({
     CHANGE_STUDENT(state, student) {
       state.student = student
     },
-    UPDATE_USER(state, userName){
+    UPDATE_STUDENT_SCREENSHOT(state, studentScreenshot) {
+      state.studentsScreenshots[studentScreenshot.name] = studentScreenshot.screenshot.slice(2, -1)
+      console.log(state.studentsScreenshots)
+    },
+    UPDATE_USER(state, userName) {
       state.userName = userName
     }
   },
   actions: {
     login(context, credentials) {
-      
+
       return new Promise((resolve, reject) => {
         context.commit('LOADING', true)
         context.commit('LOGIN', false)
 
         let authorization = 'Basic ' + window.btoa(`${credentials.login}:${credentials.password}`)
         window.sessionStorage.setItem('Authorization', authorization)
-        
+
         axios
           .get("http://www.iraminius.pl/sauron/api/auth", {
-            headers: {'Authorization': window.sessionStorage.getItem('Authorization')}
+            headers: { 'Authorization': window.sessionStorage.getItem('Authorization') }
           })
           .then(res => {
             context.commit('LOGIN', true)
@@ -110,7 +115,7 @@ export default new Vuex.Store({
     },
     fetchRooms(context) {
       return new Promise((resolve, reject) => {
-        context.commit('LOADING', true)        
+        context.commit('LOADING', true)
       })
     },
     chooseRoom(context, roomName) {
@@ -121,13 +126,13 @@ export default new Vuex.Store({
         context.commit('LOADING', true)
 
         axios
-          .get("http://iraminius.pl/sauron/api/whitelist",{
-            headers: {'Authorization': window.sessionStorage.getItem('Authorization')},
-            params:{
+          .get("http://iraminius.pl/sauron/api/whitelist", {
+            headers: { 'Authorization': window.sessionStorage.getItem('Authorization') },
+            params: {
               user: this.state.userName,
               only_active: 0
             }
-      })
+          })
           .then(res => {
             context.commit('UPDATE_WHITELISTS', res.data)
 
@@ -143,27 +148,28 @@ export default new Vuex.Store({
     },
     chooseWhitelist(context, selectedWhitelist) {
       return new Promise((resolve, reject) => {
-      
-      axios
+
+        axios
           .patch("http://iraminius.pl/sauron/api/whitelist", {}, {
-            headers: {'Authorization': window.sessionStorage.getItem('Authorization')},
-            params:{
+            headers: { 'Authorization': window.sessionStorage.getItem('Authorization') },
+            params: {
               id: this.state.whitelist.id,
               active: 0
-            }})
-      
-      console.log(selectedWhitelist.name)
-      console.log(selectedWhitelist.id)
-      axios
-          .patch("http://iraminius.pl/sauron/api/whitelist",{}, {
-            headers: {'Authorization': window.sessionStorage.getItem('Authorization')},
-            params:{
+            }
+          })
+
+        console.log(selectedWhitelist.name)
+        console.log(selectedWhitelist.id)
+        axios
+          .patch("http://iraminius.pl/sauron/api/whitelist", {}, {
+            headers: { 'Authorization': window.sessionStorage.getItem('Authorization') },
+            params: {
               id: selectedWhitelist.id,
               active: 1
             }
+          })
+        context.commit('CHANGE_WHITELIST', selectedWhitelist)
       })
-      context.commit('CHANGE_WHITELIST', selectedWhitelist)
-        })
     },
     editWhitelist(context, whitelist) {
       context.commit('EDIT_WHITELIST', whitelist)
@@ -171,30 +177,30 @@ export default new Vuex.Store({
     deleteWhitelist(context, whitelist) {
       return new Promise((resolve, reject) => {
         context.commit('LOADING', true)
-  
+
         axios
-            .delete("http://iraminius.pl/sauron/api/whitelist", whitelist.id)
-            .then(() => {
-              context.dispatch('fetchWhitelists')
-            })
-            .catch(() => {
-              context.commit('ERROR', 'Nie udało się usunąć listy')
-              context.commit('LOADING', false)
-              reject()
-            });
+          .delete("http://iraminius.pl/sauron/api/whitelist", whitelist.id)
+          .then(() => {
+            context.dispatch('fetchWhitelists')
           })
+          .catch(() => {
+            context.commit('ERROR', 'Nie udało się usunąć listy')
+            context.commit('LOADING', false)
+            reject()
+          });
+      })
     },
     addWhitelist(context) {
-      context.commit('EDIT_WHITELIST', {id: null, name: "Nowa lista", allowed: []})
+      context.commit('EDIT_WHITELIST', { id: null, name: "Nowa lista", allowed: [] })
     },
     saveWhitelist(context) {
       return new Promise((resolve, reject) => {
-      context.commit('LOADING', true)
+        context.commit('LOADING', true)
         console.log(context.state.editWhitelist.name)
-      axios
-          .post("http://iraminius.pl/sauron/api/whitelist",{},{
-            headers:{'Authorization': window.sessionStorage.getItem('Authorization')},
-            body:{
+        axios
+          .post("http://iraminius.pl/sauron/api/whitelist", {}, {
+            headers: { 'Authorization': window.sessionStorage.getItem('Authorization') },
+            body: {
               name: context.state.editWhitelist.name,
               processes: context.state.editWhitelist.allowed,
               group: context.state.editWhitelist.group
@@ -208,15 +214,39 @@ export default new Vuex.Store({
             context.commit('LOADING', false)
             reject()
           });
-        })
+      })
     },
     fetchStudents(context) {
       return new Promise((resolve, reject) => {
         context.commit('LOADING', true)
+
+        axios.get("http://www.iraminius.pl/sauron/api/screenshotlist", {
+          headers: { 'Authorization': window.sessionStorage.getItem('Authorization') },
+          params: {
+            time_from: (Date.now() / 1000 - 7200 - 10).toFixed(0),
+            time_to: (Date.now() / 1000 - 7200).toFixed(0),
+            group: this.state.room,
+            newest: true
+          }
+        }).then(res => {
+          if (res.data.length !== 0) {
+            res.data.forEach(screenshot => {
+              axios.get("http://www.iraminius.pl/sauron/api/screenshot", {
+                headers: { 'Authorization': window.sessionStorage.getItem('Authorization') },
+                params: {
+                  filename: screenshot.filename
+                }
+              }).then(res => {
+                context.commit('UPDATE_STUDENT_SCREENSHOT', { student: screenshot.nazgul, screenshot: res.data.screenshot});
+              })
+            })
+          }
+        })
+
         axios
           .get("http://www.iraminius.pl/sauron/api/process", {
-            headers: {'Authorization': window.sessionStorage.getItem('Authorization')},
-            params:{
+            headers: { 'Authorization': window.sessionStorage.getItem('Authorization') },
+            params: {
               time_from: (Date.now() / 1000 - 7200 - 10).toFixed(0),
               time_to: (Date.now() / 1000 - 7200).toFixed(0),
               group: this.state.room
@@ -268,34 +298,45 @@ export default new Vuex.Store({
         context.commit('CHANGE_STUDENT', studentIndex)
       })
     },
-    updateStudents(context){
+    updateStudents(context) {
       setInterval(() => {
         return new Promise((resolve, reject) => {
           context.commit('LOADING', true)
 
-          axios.get("http://www.iraminius.pl/sauron/api/screenshotlist",{
-            headers: {'Authorization': window.sessionStorage.getItem('Authorization')},
-            params:{
-                time_from: (Date.now() / 1000 - 7200 - 10).toFixed(0),
-                time_to: (Date.now() / 1000 - 7200).toFixed(0),
-                group: this.state.room,
-                nazgul: this.state.student.nazgul,
-                newest: true
+          axios.get("http://www.iraminius.pl/sauron/api/screenshotlist", {
+            headers: { 'Authorization': window.sessionStorage.getItem('Authorization') },
+            params: {
+              time_from: (Date.now() / 1000 - 7200 - 10).toFixed(0),
+              time_to: (Date.now() / 1000 - 7200).toFixed(0),
+              group: this.state.room,
+              newest: true
             }
-          }).then(res=>{
-            console.log(res)
+          }).then(res => {
+            if (res.data.length !== 0) {
+              res.data.forEach(screenshot => {
+                axios.get("http://www.iraminius.pl/sauron/api/screenshot", {
+                  headers: { 'Authorization': window.sessionStorage.getItem('Authorization') },
+                  params: {
+                    filename: screenshot.filename
+                  }
+                }).then(res => {
+                  context.commit('UPDATE_STUDENT_SCREENSHOT', { student: screenshot.nazgul, screenshot: res.data.screenshot});
+                })
+              })
+            }
           })
 
           axios
             .get("http://www.iraminius.pl/sauron/api/process", {
-              headers: {'Authorization': window.sessionStorage.getItem('Authorization')},
-              params:{
+              headers: { 'Authorization': window.sessionStorage.getItem('Authorization') },
+              params: {
                 time_from: (Date.now() / 1000 - 7200 - 10).toFixed(0),
                 time_to: (Date.now() / 1000 - 7200).toFixed(0),
                 group: this.state.room
               }
             })
             .then(res => {
+
               let students = context.state.students.map(student => {
                 return student
               })
