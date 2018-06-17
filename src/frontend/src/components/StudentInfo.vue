@@ -1,8 +1,8 @@
 <template>
-    <div class="student-info" v-bind:class="{ opened: Object.values(this.$store.state.students[this.$store.state.student]) != 0 }">
-        <h1>{{this.$store.state.student.name}}</h1>
+    <div class="student-info" v-bind:class="{ opened: Object.values(this.$store.state.student).length != 0 }">
+        <h1>{{this.$store.state.student.nazgul}}</h1>
         <span class="processess">
-            <img class="screenshot" :src="'data:image/png;base64, ' + this.$store.state.studentsScreenshots[this.$store.state.student.name]" alt="Screenshot" />
+            <img class="screenshot" :src="'data:image/png;base64, ' + this.$store.state.studentsScreenshots[this.$store.state.student.nazgul]" alt="Screenshot" />
             
             <h2>Uruchomione procesy:</h2>
                 <table class="table table-striped table-borderes">
@@ -14,7 +14,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr v-bind:key="process.pid" v-for="process in this.$store.state.students[this.$store.state.student].processes">
+                <tr v-bind:key="process.pid" v-for="process in this.$store.state.student.processes">
                     <td>{{process.pid}}</td>
                     <td>{{process.name}}</td>
                     <td>{{process.username}}</td>

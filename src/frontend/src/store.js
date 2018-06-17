@@ -67,7 +67,7 @@ export default new Vuex.Store({
       state.student = student
     },
     UPDATE_STUDENT_SCREENSHOT(state, studentScreenshot) {
-      state.studentsScreenshots[studentScreenshot.name] = studentScreenshot.screenshot.slice(2, -1)
+      state.studentsScreenshots[studentScreenshot.student] = studentScreenshot.screenshot.slice(2, -1)
       console.log(state.studentsScreenshots)
     },
     UPDATE_USER(state, userName) {
@@ -231,13 +231,21 @@ export default new Vuex.Store({
         }).then(res => {
           if (res.data.length !== 0) {
             res.data.forEach(screenshot => {
-              axios.get("http://www.iraminius.pl/sauron/api/screenshot", {
+              let screenshotGet = axios.create({
+                method: 'get',
+                baseURL: "http://www.iraminius.pl/sauron/api/screenshot",
                 headers: { 'Authorization': window.sessionStorage.getItem('Authorization') },
                 params: {
                   filename: screenshot.filename
-                }
-              }).then(res => {
-                context.commit('UPDATE_STUDENT_SCREENSHOT', { student: screenshot.nazgul, screenshot: res.data.screenshot});
+                },
+                transformResponse: [function (data) {
+                  let jsonData = JSON.parse(data)
+                  jsonData.nazgul = screenshot.nazgul
+                  return jsonData
+                }]
+              })
+              screenshotGet.get().then(res => {
+                context.commit('UPDATE_STUDENT_SCREENSHOT', { student: res.data.nazgul, screenshot: res.data.screenshot });
               })
             })
           }
@@ -295,7 +303,7 @@ export default new Vuex.Store({
           return student.nazgul === selectedStudent.nazgul
         })
 
-        context.commit('CHANGE_STUDENT', studentIndex)
+        context.commit('CHANGE_STUDENT', context.state.students[studentIndex])
       })
     },
     updateStudents(context) {
@@ -314,13 +322,21 @@ export default new Vuex.Store({
           }).then(res => {
             if (res.data.length !== 0) {
               res.data.forEach(screenshot => {
-                axios.get("http://www.iraminius.pl/sauron/api/screenshot", {
+                let screenshotGet = axios.create({
+                  method: 'get',
+                  baseURL: "http://www.iraminius.pl/sauron/api/screenshot",
                   headers: { 'Authorization': window.sessionStorage.getItem('Authorization') },
                   params: {
                     filename: screenshot.filename
-                  }
-                }).then(res => {
-                  context.commit('UPDATE_STUDENT_SCREENSHOT', { student: screenshot.nazgul, screenshot: res.data.screenshot});
+                  },
+                  transformResponse: [function (data) {
+                    let jsonData = JSON.parse(data)
+                    jsonData.nazgul = screenshot.nazgul
+                    return jsonData
+                  }]
+                })
+                screenshotGet.get().then(res => {
+                  context.commit('UPDATE_STUDENT_SCREENSHOT', { student: res.data.nazgul, screenshot: res.data.screenshot });
                 })
               })
             }
