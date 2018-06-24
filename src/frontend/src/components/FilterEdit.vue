@@ -30,7 +30,7 @@ export default {
       },
         whitelistAllowed: {
           get() {
-              return this.$store.state.editWhitelist.allowed
+              return this.$store.state.editWhitelist.processes
           },
           set(value) {
               this.$store.commit('updateEditWhitelistAllowed', value)

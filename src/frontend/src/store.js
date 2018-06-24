@@ -102,16 +102,17 @@ export default new Vuex.Store({
       })
     },
     logout(context) {
+      axios
+      .patch("http://iraminius.pl/sauron/api/whitelist",{},{
+       headers: {'Authorization': window.sessionStorage.getItem('Authorization')},
+        params:{
+          id: this.state.whitelist.id,
+          active: 0
+        }
+      })
       window.sessionStorage.removeItem('Authorization')
       context.commit('LOGIN', false)
-      // axios
-      //     .patch("http://iraminius.pl/sauron/api/whitelist",{},{
-      //       headers: {'Authorization': window.sessionStorage.getItem('Authorization')},
-      //       params:{
-      //         id: selectedWhitelist.id,
-      //         active: 0
-      //       }
-      // })
+     
     },
     fetchRooms(context) {
       return new Promise((resolve, reject) => {
@@ -171,6 +172,7 @@ export default new Vuex.Store({
         context.commit('CHANGE_WHITELIST', selectedWhitelist)
       })
     },
+
     editWhitelist(context, whitelist) {
       context.commit('EDIT_WHITELIST', whitelist)
     },
@@ -178,9 +180,14 @@ export default new Vuex.Store({
       return new Promise((resolve, reject) => {
         context.commit('LOADING', true)
 
-        axios
-          .delete("http://iraminius.pl/sauron/api/whitelist", whitelist.id)
-          .then(() => {
+        axios({
+          method: 'DELETE',
+          url: "http://iraminius.pl/sauron/api/whitelist",
+          headers: {'Authorization': window.sessionStorage.getItem('Authorization') },
+          data:{
+            id: whitelist.id
+          }
+        }).then(() => {
             context.dispatch('fetchWhitelists')
           })
           .catch(() => {
@@ -191,29 +198,54 @@ export default new Vuex.Store({
       })
     },
     addWhitelist(context) {
-      context.commit('EDIT_WHITELIST', { id: null, name: "Nowa lista", allowed: [] })
+      context.commit('EDIT_WHITELIST', { id: null, name: "Nowa lista", processes: [] })
     },
     saveWhitelist(context) {
       return new Promise((resolve, reject) => {
         context.commit('LOADING', true)
-        console.log(context.state.editWhitelist.name)
-        axios
-          .post("http://iraminius.pl/sauron/api/whitelist", {}, {
-            headers: { 'Authorization': window.sessionStorage.getItem('Authorization') },
-            body: {
+        var str = context.state.editWhitelist.allowed
+        console.log(context.state.editWhitelist.allowed)
+        var res = str.split(',')
+        
+        if(context.state.editWhitelist.id === null){
+          axios({
+            method: 'POST',
+            url: "http://iraminius.pl/sauron/api/whitelist",
+            headers: {'Authorization': window.sessionStorage.getItem('Authorization') },
+            data: {
               name: context.state.editWhitelist.name,
-              processes: context.state.editWhitelist.allowed,
+              processes: res,
               group: context.state.editWhitelist.group
             }
           })
-          .then(() => {
-            context.dispatch('fetchWhitelists')
-          })
-          .catch(() => {
-            context.commit('ERROR', 'Nie udało się zapisać listy')
-            context.commit('LOADING', false)
-            reject()
-          });
+            .then(() => {
+              context.dispatch('fetchWhitelists')
+            })
+            .catch(() => {
+              context.commit('ERROR', 'Nie udało się zapisać listy')
+              context.commit('LOADING', false)
+              reject()
+            });
+        }else{
+          axios
+          .patch("http://iraminius.pl/sauron/api/whitelist", {}, {
+            headers: { 'Authorization': window.sessionStorage.getItem('Authorization') },
+            params: {
+              id: context.state.editWhitelist.id,
+              name: context.state.editWhitelist.name,
+              processes: res,
+              group: context.state.editWhitelist.group
+            }
+          }).then(() => {
+              context.dispatch('fetchWhitelists')
+            })
+            .catch(() => {
+              context.commit('ERROR', 'Nie udało się zapisać listy')
+              context.commit('LOADING', false)
+              reject()
+            });
+        }
+        
       })
     },
     fetchStudents(context) {
