@@ -91,6 +91,7 @@ class Nazgul:
         self.processes = []
         self.whitelist = {'processes': []}
         self.screenshooter = mss.mss()
+        self.screenshots_directory = os.path.join(os.path.curdir, 'screenshots')
         self.screenshots_to_send = []
         self.auth = requests.auth.HTTPBasicAuth(self.name, self.config['password'])
 
@@ -102,11 +103,10 @@ class Nazgul:
         return [p for p in processes if p['username'] == processes_username]
 
     def _shoot_screenshot(self):
-        screenshots_directory = os.path.join(os.path.curdir, 'screenshots')
-        os.makedirs(screenshots_directory, exist_ok=True)
+        os.makedirs(self.screenshots_directory, exist_ok=True)
         current_datetime = datetime.datetime.utcnow()
         filename = '{}-{}-{:%Y%m%d%H%M%S}.png'.format(self.name, self.config['group'], current_datetime)
-        filepath = os.path.join(screenshots_directory, filename)
+        filepath = os.path.join(self.screenshots_directory, filename)
         self.screenshooter.shot(mon=-1, output=filepath)
         return collections.namedtuple('ScreenshotFile', 'filepath, create_time')._make([filepath, int(current_datetime.timestamp())])
 
@@ -149,6 +149,10 @@ class Nazgul:
                 if self.screenshots_to_send:
                     logging.error('%s screenshots sent to server unsuccessfully',
                                   len(self.screenshots_to_send))
+                for screenshot_filepath in [os.path.join(self.screenshots_directory, s) for s in os.listdir(self.screenshots_directory)]:
+                    if screenshot_filepath not in [s.filepath for s in self.screenshots_to_send]:
+                        os.remove(screenshot_filepath)
+                        logging.info('%s removed', screenshot_filepath)
 
     def _send_processes_to_server(self, processes):
         url = '{0[hostname]}{0[process_endpoint]}'.format(self.config['server'])
