@@ -48,9 +48,10 @@ def _get_current_processes():
 
 
 def _update_alarms(blacklisted_processes, processes):
+    any_alarm_occurred = False
     for p in processes:
-        any_alarm_occurred = p['name'] in blacklisted_processes
-        p.update({'alarm': any_alarm_occurred})
+        p.update({'alarm': p['name'] in blacklisted_processes})
+        any_alarm_occurred |= p['alarm']
     return any_alarm_occurred
 
 
@@ -195,8 +196,12 @@ class Nazgul:
             logging.error(e)
             return False
         if response.ok:
-            self.blacklist = json.loads(response.content.decode())[0]
-            logging.debug('current blacklist: %s', self.blacklist)
+            response_json = json.loads(response.content.decode())
+            if response_json:
+                self.blacklist = response_json[0]
+                logging.debug('current blacklist: %s', self.blacklist)
+            else:
+                logging.warning('got empty blacklist json')
         else:
             logging.error('response: %s %s', response.status_code, response.reason)
         return response.ok
