@@ -65,3 +65,27 @@ class WhitelistService:
                     raise cherrypy.HTTPError(400, 'Bad Request')
         else:
             raise cherrypy.HTTPError(401, 'Unauthorized')
+
+    @cherrypy.tools.json_in()
+    def PUT(self, id):
+        with COLLECTIONS['users'] as col:
+            user = col.find_one({'login': cherrypy.request.login})
+        if user['account_type'] in ('superadmin', 'user'):
+            request = cherrypy.request.json
+            with COLLECTIONS['whitelists'] as col:
+                try:
+                    col.update_many({'id': id}, {'$set': {'processes': request['processes'], 'group': request['group'], 'name': request['name']}})
+                except (KeyError, TypeError):
+                    raise cherrypy.HTTPError(400, 'Bad Request')
+        else:
+            raise cherrypy.HTTPError(401, 'Unauthorized')
+
+
+    def DELETE(self, id):
+        with COLLECTIONS['users'] as col:
+            user = col.find_one({'login': cherrypy.request.login})
+        if user['account_type'] in ('superadmin', 'user'):
+            with COLLECTIONS['whitelists'] as col:
+                col.delete_many({'id': id})
+        else:
+            raise cherrypy.HTTPError(401, 'Unauthorized')
