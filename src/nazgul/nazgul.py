@@ -92,6 +92,7 @@ class Nazgul:
         self.whitelist = {'processes': []}
         self.screenshooter = mss.mss()
         self.screenshots_directory = os.path.join(os.path.curdir, 'screenshots')
+        os.makedirs(self.screenshots_directory, exist_ok=True)
         self.screenshots_to_send = []
         self.auth = requests.auth.HTTPBasicAuth(self.name, self.config['password'])
 
@@ -103,7 +104,6 @@ class Nazgul:
         return [p for p in processes if p['username'] == processes_username]
 
     def _shoot_screenshot(self):
-        os.makedirs(self.screenshots_directory, exist_ok=True)
         current_datetime = datetime.datetime.utcnow()
         filename = '{}-{}-{:%Y%m%d%H%M%S}.png'.format(self.name, self.config['group'], current_datetime)
         filepath = os.path.join(self.screenshots_directory, filename)
