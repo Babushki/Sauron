@@ -2,7 +2,7 @@
 <div>
   <ul>
       <li>
-          <router-link to="/home"><button>Podlgąd sali</button></router-link>
+          <router-link to="/home">Podlgąd sali</router-link>
       </li>
   <li class="dropdown">
     <a class="dropbtn" v-if="this.$store.state.whitelist !== ''">Wybrany filtr: {{this.$store.state.whitelist.name}}</a>
@@ -11,14 +11,14 @@
       <a v-for="(data,index) in this.$store.state.whitelists" :key='index'>
           <a v-on:click="submitWhitelist(data)">{{data.name}}</a>
       </a>
-      <router-link to="/filters">Zarządzaj filtrami</router-link>
+      <a><router-link to="/filters">Zarządzaj filtrami</router-link></a>
     </div>
   </li>
   <li class="dropdown">
    <a  v-if="this.$store.state.room !== ''" class="dropbtn">Wybrana sala: {{this.$store.state.room}}</a>
     <a v-else>Brak wybranej sali</a>
     <div class="dropdown-content">
-      <input  v-model="selected" >
+      <a><input  v-model="selected" ></a>
       <a class="btn" type="submit" v-on:click="submitRoom(selected)" > Wejdź do sali</a>
     </div>
   </li>

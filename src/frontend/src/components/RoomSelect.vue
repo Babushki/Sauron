@@ -11,7 +11,7 @@
           <h2> Wpisz grupę do monitorowania:</h2>
       
       <input  v-model="selected" >
-      
+      <br/>
       <a class="btn" type="submit" v-on:click="submit" > Wejdź do sali</a>
         </center>
     </div>
@@ -40,6 +40,9 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+input{
+  margin-bottom: 3em;
+}
 .background {
   background-size: cover !important;
   background-repeat: no-repeat !important;
@@ -84,6 +87,7 @@ select {
   font-size: 1.2rem;
   padding: 1rem 2rem;
   cursor: pointer;
+  margin-top: 3em;
 }
 .btn:hover{
   opacity: .90;
