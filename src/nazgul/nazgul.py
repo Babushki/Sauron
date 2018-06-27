@@ -89,7 +89,7 @@ class Nazgul:
                 seconds=config['time period']['server communication'])),
             'screenshot': Timer(datetime.timedelta(seconds=30))}
         self.processes = []
-        self.whitelist = {}
+        self.whitelist = {'processes': []}
         self.screenshooter = mss.mss()
         self.screenshots_to_send = []
         self.auth = requests.auth.HTTPBasicAuth(self.name, self.config['password'])
