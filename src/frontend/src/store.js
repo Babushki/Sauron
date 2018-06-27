@@ -123,6 +123,11 @@ export default new Vuex.Store({
       context.commit('CHANGE_ROOM', roomName)
     },
     fetchWhitelists(context) {
+      let auth = window.sessionStorage.getItem('Authorization')
+      let encoded = auth.split(' ').pop()
+      let decoded = window.atob(encoded)
+      let userName = decoded.substr(0,decoded.indexOf(':'))
+      console.log(userName)
       return new Promise((resolve, reject) => {
         context.commit('LOADING', true)
 
@@ -130,13 +135,17 @@ export default new Vuex.Store({
           .get("http://iraminius.pl/sauron/api/whitelist", {
             headers: { 'Authorization': window.sessionStorage.getItem('Authorization') },
             params: {
-              user: this.state.userName,
+              user: userName,
               only_active: 0
             }
           })
           .then(res => {
             context.commit('UPDATE_WHITELISTS', res.data)
-
+            for(var i=0; i<res.data.length; i++){
+              if(res.data[i].active === true){
+                context.commit('CHANGE_WHITELIST', res.data[i])
+              }
+            }
             context.commit('LOADING', false)
             resolve()
           })
@@ -184,7 +193,7 @@ export default new Vuex.Store({
           method: 'DELETE',
           url: "http://iraminius.pl/sauron/api/whitelist",
           headers: {'Authorization': window.sessionStorage.getItem('Authorization') },
-          data:{
+          params:{
             id: whitelist.id
           }
         }).then(() => {
@@ -227,15 +236,18 @@ export default new Vuex.Store({
               reject()
             });
         }else{
-          axios
-          .patch("http://iraminius.pl/sauron/api/whitelist", {}, {
-            headers: { 'Authorization': window.sessionStorage.getItem('Authorization') },
-            params: {
-              id: context.state.editWhitelist.id,
+          axios({
+            method: 'PUT',
+            url: "http://iraminius.pl/sauron/api/whitelist",
+            headers: {'Authorization': window.sessionStorage.getItem('Authorization') },
+            params:{
+              id: context.state.editWhitelist.id
+            },
+            data:{
               name: context.state.editWhitelist.name,
               processes: res,
               group: context.state.editWhitelist.group
-            }
+            }        
           }).then(() => {
               context.dispatch('fetchWhitelists')
             })

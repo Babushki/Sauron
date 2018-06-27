@@ -14,7 +14,8 @@
             </thead>
             <tbody>
               <tr v-for="(student,index) in this.$store.state.students" :key='index' >
-                <td>{{student.nazgul}}</td>
+                <td v-if="student.alarm === true"><p class="red">{{student.nazgul}}</p></td>
+                <td v-if="student.alarm === false">{{student.nazgul}}</td>
                 <td>
                   <button v-on:click="$store.dispatch('chooseStudent', student)">Podgląd</button>
                 </td>
@@ -43,6 +44,9 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+.red{
+  color: red !important;
+}
 .body-container {
   display: flex;
   justify-content: space-between;
