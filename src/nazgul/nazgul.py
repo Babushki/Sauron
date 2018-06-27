@@ -13,6 +13,7 @@ import logging
 import logging.config
 import os
 import os.path
+import platform
 
 import mss
 import psutil
@@ -94,7 +95,11 @@ class Nazgul:
         self.auth = requests.auth.HTTPBasicAuth(self.name, self.config['password'])
 
     def _filter_processes(self, processes):
-        return [p for p in processes if p['username'] == self.current_user]
+        if platform.system() == 'Windows':
+            processes_username = '{}\\{}'.format(platform.node(), self.current_user)
+        else:
+            processes_username = self.current_user
+        return [p for p in processes if p['username'] == processes_username]
 
     def _shoot_screenshot(self):
         screenshots_directory = os.path.join(os.path.curdir, 'screenshots')
