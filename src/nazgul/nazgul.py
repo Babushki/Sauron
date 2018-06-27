@@ -120,6 +120,8 @@ class Nazgul:
                 self.timers['processes collecting'].restart()
                 processes = self._filter_processes(_get_current_processes())
                 any_alarm_occured = _update_alarms(self.blacklist['processes'], processes)
+                if any_alarm_occured:
+                    logging.info('alarm occured')
                 collected_processes = {'nazgul': self.name,
                                        'group': self.config['group'],
                                        'processes': processes,
@@ -194,6 +196,7 @@ class Nazgul:
             return False
         if response.ok:
             self.blacklist = json.loads(response.content.decode())[0]
+            logging.debug('current blacklist: %s', self.blacklist)
         else:
             logging.error('response: %s %s', response.status_code, response.reason)
         return response.ok
