@@ -68,7 +68,6 @@ export default new Vuex.Store({
     },
     UPDATE_STUDENT_SCREENSHOT(state, studentScreenshot) {
       state.studentsScreenshots[studentScreenshot.student] = studentScreenshot.screenshot.slice(2, -1)
-      console.log(state.studentsScreenshots)
     },
     UPDATE_USER(state, userName) {
       state.userName = userName
@@ -127,7 +126,6 @@ export default new Vuex.Store({
       let encoded = auth.split(' ').pop()
       let decoded = window.atob(encoded)
       let userName = decoded.substr(0,decoded.indexOf(':'))
-      console.log(userName)
       return new Promise((resolve, reject) => {
         context.commit('LOADING', true)
 
@@ -168,8 +166,6 @@ export default new Vuex.Store({
             }
           })
 
-        console.log(selectedWhitelist.name)
-        console.log(selectedWhitelist.id)
         axios
           .patch("http://iraminius.pl/sauron/api/whitelist", {}, {
             headers: { 'Authorization': window.sessionStorage.getItem('Authorization') },
@@ -213,7 +209,6 @@ export default new Vuex.Store({
       return new Promise((resolve, reject) => {
         context.commit('LOADING', true)
         var str = context.state.editWhitelist.allowed
-        console.log(context.state.editWhitelist.allowed)
         var res = str.split(',')
         
         if(context.state.editWhitelist.id === null){

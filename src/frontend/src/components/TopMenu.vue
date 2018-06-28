@@ -56,10 +56,7 @@ export default {
             this.$store.dispatch("fetchStudents");
             },
             submitWhitelist: function(whitelist){
-            this.$store.dispatch("chooseWhitelist", whitelist).then(()=>
-            {
-                console.log(this.$store.state.whitelist.active);
-            })
+            this.$store.dispatch("chooseWhitelist", whitelist)
             }
         }
     }
