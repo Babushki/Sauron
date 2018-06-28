@@ -61,13 +61,15 @@ export default new Vuex.Store({
       state.editWhitelist.group = group
     },
     UPDATE_STUDENTS(state, students) {
-      state.students = students
+      state.students = [...students]
     },
     CHANGE_STUDENT(state, student) {
       state.student = student
     },
     UPDATE_STUDENT_SCREENSHOT(state, studentScreenshot) {
-      state.studentsScreenshots[studentScreenshot.student] = studentScreenshot.screenshot.slice(2, -1)
+      let studentsScreenshots = JSON.parse(JSON.stringify(state.studentsScreenshots))
+      studentsScreenshots[studentScreenshot.student] = studentScreenshot.screenshot.slice(2, -1)
+      state.studentsScreenshots = studentsScreenshots
     },
     UPDATE_USER(state, userName) {
       state.userName = userName
@@ -325,6 +327,8 @@ export default new Vuex.Store({
             context.commit('UPDATE_STUDENTS', students)
             context.commit('LOADING', false)
 
+            context.dispatch('chooseStudent', JSON.parse(JSON.stringify(context.state.student)))
+
             resolve()
           })
           .catch(() => {
@@ -353,7 +357,7 @@ export default new Vuex.Store({
           axios.get("http://www.iraminius.pl/sauron/api/screenshotlist", {
             headers: { 'Authorization': window.sessionStorage.getItem('Authorization') },
             params: {
-              time_from: (Date.now() / 1000 - 7200 - 10).toFixed(0),
+              time_from: (Date.now() / 1000 - 7200 - 7).toFixed(0),
               time_to: (Date.now() / 1000 - 7200).toFixed(0),
               group: this.state.room,
               newest: true
@@ -385,14 +389,14 @@ export default new Vuex.Store({
             .get("http://www.iraminius.pl/sauron/api/process", {
               headers: { 'Authorization': window.sessionStorage.getItem('Authorization') },
               params: {
-                time_from: (Date.now() / 1000 - 7200 - 10).toFixed(0),
+                time_from: (Date.now() / 1000 - 7200 - 7).toFixed(0),
                 time_to: (Date.now() / 1000 - 7200).toFixed(0),
                 group: this.state.room
               }
             })
             .then(res => {
 
-              let students = context.state.students.map(student => {
+              let students =  context.state.students.map(student => {
                 return student
               })
 
@@ -415,6 +419,9 @@ export default new Vuex.Store({
               })
               context.commit('UPDATE_STUDENTS', students)
               context.commit('LOADING', false)
+
+              context.dispatch('chooseStudent', JSON.parse(JSON.stringify(context.state.student)))
+
               resolve()
             })
             .catch(() => {
