@@ -1,9 +1,9 @@
 """
 Implementation of Nazgul application
 
-Which periodically collects information about what processes are
-executed in the OS, and what websites are visited by currently logged
-user, and then sends them to the server of the Sauron system.
+Which periodically collects information about what processes are executed in
+the OS, and takes a screenshots, and then sends them to the server of the
+Sauron system.
 """
 
 import collections
